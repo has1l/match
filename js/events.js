@@ -304,7 +304,7 @@ const Events = {
         const baseStat = isGoalie ? defTeam.goalie : defTeam.defense;
         return {
           name: Events.pick(isGoalie ? this.goalieNames : this.defenderNames),
-          pos: isGoalie ? 'goalie' : 'defender',
+          pos: isGoalie ? 'Вратарь' : 'Защитник',
           stat: Math.round(Events.clamp(baseStat + Events.rand(-6, 6), 40, 99)),
           statName: isGoalie ? 'save' : 'defense',
         };

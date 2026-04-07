@@ -5056,3 +5056,522 @@ button:active { transform: scale(0.97); }
 }
 
 .rs-btn--map:active { opacity: 0.7; }
+
+/* =============================================
+   RESPONSIVE — 1100px+
+   ============================================= */
+@media (min-width: 1100px) {
+  .pm3-root {
+    background:
+      radial-gradient(circle at top center, rgba(255,255,255,0.05), transparent 38%),
+      #0a0a0f;
+  }
+
+  .pm3-hero {
+    padding: 20px 24px 28px;
+  }
+
+  .pm3-back-btn {
+    top: 18px;
+    left: 18px;
+    width: 46px;
+    height: 46px;
+    font-size: 22px;
+    border-radius: 14px;
+  }
+
+  .pm3-level-tag {
+    font-size: 14px;
+    letter-spacing: 2.2px;
+    margin-bottom: 18px;
+  }
+
+  .pm3-hero-teams {
+    gap: 24px;
+  }
+
+  .pm3-hero-emoji {
+    font-size: 64px;
+  }
+
+  .pm3-hero-name {
+    font-size: 22px;
+    max-width: 260px;
+  }
+
+  .pm3-hero-rating {
+    font-size: 16px;
+  }
+
+  .pm3-hero-score {
+    font-size: 52px;
+    letter-spacing: 4px;
+  }
+
+  .pm3-hero-vs-label {
+    font-size: 14px;
+    letter-spacing: 3px;
+  }
+
+  .pm3-body {
+    padding-bottom: 20px;
+  }
+
+  .pm3-winpct-row {
+    padding: 18px 24px 10px;
+  }
+
+  .pm3-winpct-bar {
+    padding: 16px 22px;
+    border-radius: 18px;
+  }
+
+  .pm3-winpct-a,
+  .pm3-winpct-b {
+    font-size: 28px;
+  }
+
+  .pm3-winpct-sep {
+    font-size: 14px;
+    letter-spacing: 1.6px;
+  }
+
+  .pm3-grid {
+    grid-template-columns: minmax(0, 1.12fr) minmax(420px, 0.94fr);
+    gap: 18px 24px;
+    align-items: start;
+  }
+
+  .pm3-section,
+  .pm3-predict-card {
+    margin-left: 24px;
+    margin-right: 24px;
+  }
+
+  .pm3-section {
+    padding: 22px 0 0;
+  }
+
+  .pm3-section-title {
+    font-size: 13px;
+    margin-bottom: 16px;
+    letter-spacing: 2.2px;
+  }
+
+  .pm3-stat-row {
+    grid-template-columns: 48px 1fr 48px;
+    gap: 8px 14px;
+    margin-bottom: 16px;
+  }
+
+  .pm3-sv {
+    font-size: 20px;
+  }
+
+  .pm3-bar-track {
+    height: 12px;
+    border-radius: 8px;
+    gap: 4px;
+  }
+
+  .pm3-stat-label {
+    font-size: 13px;
+    margin-top: 1px;
+  }
+
+  .pm3-form-row {
+    gap: 14px;
+    margin-bottom: 12px;
+  }
+
+  .pm3-form-emoji {
+    font-size: 28px;
+  }
+
+  .pm3-form-dots {
+    gap: 8px;
+  }
+
+  .pm3-dot {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    font-size: 14px;
+  }
+
+  .pm3-section--players,
+  .pm3-predict-card {
+    align-self: stretch;
+  }
+
+  .pm3-section--players {
+    overflow: hidden;
+  }
+
+  .pm3-players-scroll {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    overflow: visible;
+    padding-bottom: 0;
+  }
+
+  .pm3-player-card {
+    min-width: 0;
+    width: 100%;
+    gap: 14px;
+    padding: 16px 18px;
+    border-radius: 18px;
+  }
+
+  .pm3-player-av {
+    width: 52px;
+    height: 52px;
+    font-size: 22px;
+    border-radius: 14px;
+  }
+
+  .pm3-player-name {
+    font-size: 18px;
+  }
+
+  .pm3-player-pos {
+    font-size: 13px;
+    margin-top: 4px;
+  }
+
+  .pm3-player-stats {
+    gap: 6px;
+    font-size: 15px;
+  }
+
+  .pm3-predict-card {
+    margin-top: 22px;
+    padding: 24px;
+    border-radius: 22px;
+  }
+
+  .pm3-predict-q {
+    margin-bottom: 20px;
+  }
+
+  .pm3-predict-q-title {
+    font-size: 18px;
+    margin-bottom: 14px;
+  }
+
+  .pm3-opts {
+    gap: 12px;
+  }
+
+  .pm3-opt {
+    padding: 18px 14px;
+    font-size: 17px;
+    border-radius: 16px;
+  }
+
+  .pm3-predict-hint {
+    font-size: 14px;
+    margin-top: 8px;
+  }
+
+  .pm3-footer {
+    padding: 16px 24px calc(22px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .pm3-start-btn {
+    padding: 22px 20px;
+    font-size: 22px;
+    border-radius: 20px;
+    box-shadow: 0 6px 0 #9a7200, 0 14px 32px rgba(232,185,35,0.28);
+  }
+
+  .lv-root {
+    padding-inline: 20px;
+    background:
+      radial-gradient(circle at top center, rgba(255,255,255,0.05), transparent 34%),
+      #101014;
+  }
+
+  .lv-topbar,
+  .lv-players-bar,
+  .lv-question-bar,
+  .lv-answers,
+  .lv-feedback,
+  .lv-inforow,
+  .lv-stage {
+    width: min(100%, 1540px);
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .lv-stage {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 360px;
+    align-items: start;
+    gap: 18px;
+  }
+
+  .lv-field-wrap,
+  #lv-evlog-wrap {
+    width: 100%;
+    margin: 0;
+    min-width: 0;
+  }
+
+  .lv-topbar {
+    padding: 16px 24px 14px;
+    gap: 18px;
+    border-radius: 0 0 20px 20px;
+  }
+
+  .lv-topbar-emoji {
+    font-size: 28px;
+  }
+
+  .lv-topbar-name {
+    font-size: 16px;
+  }
+
+  .lv-topbar-score {
+    font-size: 42px;
+    min-width: 38px;
+  }
+
+  .lv-topbar-time {
+    font-size: 26px;
+  }
+
+  .lv-topbar-live {
+    font-size: 12px;
+    gap: 8px;
+  }
+
+  .lv-live-dot {
+    width: 9px;
+    height: 9px;
+  }
+
+  .lv-field {
+    height: clamp(290px, 28vw, 420px);
+    border-radius: 24px 24px 0 0;
+  }
+
+  .lv-player {
+    width: 26px;
+    height: 26px;
+    font-size: 12px;
+  }
+
+  .lv-player--gk {
+    width: 30px;
+    height: 30px;
+  }
+
+  .lv-player--att {
+    width: 34px;
+    height: 34px;
+  }
+
+  .lv-ball {
+    font-size: 34px;
+  }
+
+  .lv-field-card {
+    width: min(40%, 420px);
+    border-radius: 18px;
+    top: 6%;
+  }
+
+  .lv-field-card-head {
+    font-size: 16px;
+    padding: 12px 16px 8px;
+  }
+
+  .lv-field-card-row {
+    padding: 4px 16px 8px;
+  }
+
+  .lv-fc-name {
+    font-size: 17px;
+  }
+
+  .lv-fc-timer {
+    width: 40px;
+    height: 40px;
+  }
+
+  .lv-field-card-player {
+    font-size: 16px;
+    padding: 10px 16px 12px;
+  }
+
+  .lv-timer-track {
+    height: 8px;
+  }
+
+  .lv-players-bar {
+    gap: 12px;
+    padding: 14px 18px;
+  }
+
+  .lv-pstat {
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: 16px;
+  }
+
+  .lv-pstat-av {
+    width: 46px;
+    height: 46px;
+    font-size: 20px;
+    border-radius: 14px;
+  }
+
+  .lv-pstat-name {
+    font-size: 16px;
+  }
+
+  .lv-pstat-role {
+    font-size: 12px;
+    margin-top: 3px;
+  }
+
+  .lv-pstat-nums {
+    gap: 6px;
+    font-size: 14px;
+  }
+
+  .lv-pstat-vs {
+    font-size: 14px;
+  }
+
+  .lv-question-bar {
+    padding: 16px 24px 10px;
+  }
+
+  .lv-question-text {
+    font-size: 22px;
+    line-height: 1.35;
+  }
+
+  .lv-lives {
+    gap: 6px;
+  }
+
+  .lv-heart {
+    font-size: 20px;
+  }
+
+  .lv-answers {
+    position: sticky;
+    bottom: 0;
+    z-index: 12;
+    gap: 16px;
+    padding: 14px 20px 22px;
+    background:
+      linear-gradient(180deg, rgba(16,16,20,0) 0%, rgba(16,16,20,0.9) 18%, rgba(16,16,20,0.98) 100%);
+  }
+
+  .lv-ans {
+    gap: 6px;
+    padding: 22px 16px;
+    border-radius: 20px;
+  }
+
+  .lv-ans-icon {
+    font-size: 28px;
+  }
+
+  .lv-ans-label {
+    font-size: 20px;
+  }
+
+  .lv-ans-sub {
+    font-size: 13px;
+  }
+
+  .lv-feedback {
+    font-size: 18px;
+    min-height: 36px;
+    padding: 10px 24px;
+  }
+
+  .lv-inforow {
+    padding: 8px 24px 10px;
+    font-size: 13px;
+  }
+
+  .match-evlog-section {
+    max-height: 430px;
+    min-height: 210px;
+    padding: 16px 18px 20px;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 20px;
+    background: rgba(15,15,22,0.94);
+  }
+
+  .match-evlog-heading {
+    font-size: 14px;
+    margin-bottom: 14px;
+  }
+
+  .match-evlog-card {
+    gap: 14px;
+    padding: 14px 0 14px 14px;
+  }
+
+  .match-evlog-min {
+    font-size: 18px;
+    min-width: 42px;
+  }
+
+  .match-evlog-title {
+    font-size: 17px;
+    margin-bottom: 4px;
+  }
+
+  .match-evlog-desc {
+    font-size: 14px;
+  }
+}
+
+@media (min-width: 1500px) {
+  .pm3-hero-inner,
+  .pm3-body-inner,
+  .pm3-footer-inner,
+  .lv-topbar,
+  .lv-players-bar,
+  .lv-question-bar,
+  .lv-answers,
+  .lv-feedback,
+  .lv-inforow,
+  .lv-stage {
+    width: min(100%, 1680px);
+  }
+
+  .pm3-hero-name {
+    font-size: 26px;
+    max-width: 320px;
+  }
+
+  .pm3-hero-score {
+    font-size: 62px;
+  }
+
+  .pm3-player-card {
+    min-width: 0;
+  }
+
+  .lv-stage {
+    grid-template-columns: minmax(0, 1fr) 380px;
+  }
+
+  .lv-field {
+    height: clamp(320px, 25vw, 480px);
+  }
+
+  .lv-field-card {
+    width: min(38%, 430px);
+  }
+}
