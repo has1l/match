@@ -128,9 +128,9 @@ const Game = {
     const lvl = getLevelData(section, levelNum);
     if (!lvl) return;
 
-    const matchResult = Events.generateMatchResult(lvl.teamA, lvl.teamB);
-    const goalTotal   = Events.generateGoalTotal(lvl.teamA, lvl.teamB);
-    const liveEvents  = Events.generate(lvl.teamA, lvl.teamB, lvl.events);
+    const matchResult = Events.generateMatchResult(section, lvl.teamA, lvl.teamB);
+    const goalTotal   = Events.generateGoalTotal(section, lvl.teamA, lvl.teamB);
+    const liveEvents  = Events.generate(section, lvl.teamA, lvl.teamB, lvl.events);
 
     this.match = {
       section,

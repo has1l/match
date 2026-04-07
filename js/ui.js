@@ -266,7 +266,7 @@ const UI = {
                 <span class="hub-mode-badge">${hockeyUnlocked ? T.menuHub.available : hockeyNeed + ' очк.'}</span>
                 <div class="hub-mode-visual">🏒</div>
                 <div class="hub-mode-name">${SECTIONS.hockey.name}</div>
-                <div class="hub-mode-desc">${hockeyUnlocked ? T.menuHub.footballSim : T.menuHub.hockeySoon}</div>
+                <div class="hub-mode-desc">${hockeyUnlocked ? 'Симулятор хоккейных матчей' : T.menuHub.hockeySoon}</div>
               </button>
               <button type="button" class="hub-mode-card hub-mode-card--esports ${esUnlocked ? 'hub-mode-card--unlocked' : 'hub-mode-card--locked'}" data-section="esports" ${esUnlocked ? '' : 'disabled'}>
                 <span class="hub-mode-badge hub-mode-badge--dim">${esUnlocked ? T.menuHub.available : T.menuHub.soon}</span>
@@ -679,6 +679,61 @@ const UI = {
     });
   },
 
+  _getSportPresentation(section) {
+    if (section === 'hockey') {
+      return {
+        label: 'ХОККЕЙ',
+        icon: '🏒',
+        liveTag: 'HOCKEY LIVE',
+        goalText: 'ШАЙБА!',
+        heroBg: 'linear-gradient(135deg,#061423,#0c2847)',
+        stats: [
+          { label: 'Атака',   key: 'attack' },
+          { label: 'Защита',  key: 'defense' },
+          { label: 'Вратарь', key: 'goalie' },
+          { label: 'Темп',    key: 'tempo' },
+          { label: 'Форма',   key: 'formScore' },
+        ],
+        q1Title: '🏆 КТО ПОБЕДИТ?',
+        q1Options: (teamA, teamB) => ([
+          { id: 'A', label: teamA.shortName },
+          { id: 'B', label: teamB.shortName },
+        ]),
+        q2Title: '🥅 ТОТАЛ ШАЙБ',
+        q2Options: [
+          { id: 'low', label: 'Меньше 5.5' },
+          { id: 'high', label: 'Больше 5.5' },
+        ],
+        playerStats: (p) => [`🥅${p.shot}`, `💨${p.speed}`],
+      };
+    }
+    return {
+      label: 'ФУТБОЛ',
+      icon: '⚽',
+      liveTag: 'MATCH LIVE',
+      goalText: 'ГОЛ!',
+      heroBg: 'linear-gradient(135deg,#0a1f0a,#1a3a1a)',
+      stats: [
+        { label: 'Атака',      key: 'attack' },
+        { label: 'Защита',     key: 'defense' },
+        { label: 'Полузащита', key: 'midfield' },
+        { label: 'Форма',      key: 'formScore' },
+      ],
+      q1Title: '🏆 КТО ПОБЕДИТ?',
+      q1Options: (teamA, teamB) => ([
+        { id: 'A',    label: teamA.shortName },
+        { id: 'draw', label: 'Ничья' },
+        { id: 'B',    label: teamB.shortName },
+      ]),
+      q2Title: '⚽ ТОТАЛ ГОЛОВ',
+      q2Options: [
+        { id: 'low', label: 'Меньше 2.5' },
+        { id: 'high', label: 'Больше 2.5' },
+      ],
+      playerStats: (p) => [`⚡${p.shot}`, `🏃${p.speed}`],
+    };
+  },
+
   _fmtResultP1Q1(id) {
     const m = Game.match;
     if (!m) return '';
@@ -699,8 +754,8 @@ const UI = {
   showPreMatch(section, levelNum) {
     Game.startLevel(section, levelNum);
     const { teamA, teamB } = Game.match;
+    const sport = this._getSportPresentation(section);
 
-    // Stat comparison bar row
     const statBar = (label, a, b) => {
       const total = Math.max(a + b, 1);
       const pctA = Math.round(a / total * 100);
@@ -722,13 +777,11 @@ const UI = {
         </div>`;
     };
 
-    // Form dots
     const formDots = (form) => form.map(r => {
       const cls = r === 'W' ? 'pm3-dot--w' : r === 'D' ? 'pm3-dot--d' : 'pm3-dot--l';
       return `<span class="pm3-dot ${cls}">${r}</span>`;
     }).join('');
 
-    // Player card
     const playerCard = (p, team) => {
       if (!p) return '';
       return `
@@ -739,11 +792,13 @@ const UI = {
             <div class="pm3-player-pos">${p.pos}</div>
           </div>
           <div class="pm3-player-stats">
-            <span>⚡${p.shot}</span>
-            <span>🏃${p.speed}</span>
+            ${sport.playerStats(p).map(s => `<span>${s}</span>`).join('')}
           </div>
         </div>`;
     };
+
+    const q1Options = sport.q1Options(teamA, teamB);
+    const q2Options = sport.q2Options;
 
     const screen = this.showScreen(`
       <div class="pm3-root">
@@ -751,7 +806,7 @@ const UI = {
         <!-- HERO -->
         <div class="pm3-hero" style="--ca:${teamA.color};--cb:${teamB.color}">
           <button type="button" class="pm3-back-btn" id="pm3-back">←</button>
-          <div class="pm3-level-tag">УР.${levelNum} · ФУТБОЛ</div>
+          <div class="pm3-level-tag">УР.${levelNum} · ${sport.label}</div>
           <div class="pm3-hero-teams">
             <div class="pm3-hero-team pm3-hero-team--a">
               <div class="pm3-hero-emoji">${teamA.emoji}</div>
@@ -785,10 +840,7 @@ const UI = {
           <!-- Stats comparison -->
           <div class="pm3-section">
             <div class="pm3-section-title">СРАВНЕНИЕ ХАРАКТЕРИСТИК</div>
-            ${statBar('Атака', teamA.attack, teamB.attack)}
-            ${statBar('Защита', teamA.defense, teamB.defense)}
-            ${statBar('Полузащита', teamA.midfield, teamB.midfield)}
-            ${statBar('Форма', teamA.formScore, teamB.formScore)}
+            ${sport.stats.map(s => statBar(s.label, teamA[s.key], teamB[s.key])).join('')}
           </div>
 
           <!-- Form -->
@@ -816,18 +868,15 @@ const UI = {
           <!-- Prediction card -->
           <div class="pm3-predict-card">
             <div class="pm3-predict-q">
-              <div class="pm3-predict-q-title">🏆 КТО ПОБЕДИТ?</div>
-              <div class="pm3-opts pm3-opts--3" id="pm3-q1">
-                <button type="button" class="pm3-opt" data-id="A">${teamA.shortName}</button>
-                <button type="button" class="pm3-opt" data-id="draw">Ничья</button>
-                <button type="button" class="pm3-opt" data-id="B">${teamB.shortName}</button>
+              <div class="pm3-predict-q-title">${sport.q1Title}</div>
+              <div class="pm3-opts pm3-opts--${q1Options.length}" id="pm3-q1">
+                ${q1Options.map(o => `<button type="button" class="pm3-opt" data-id="${o.id}">${o.label}</button>`).join('')}
               </div>
             </div>
             <div class="pm3-predict-q">
-              <div class="pm3-predict-q-title">⚽ ТОТАЛ ГОЛОВ</div>
-              <div class="pm3-opts pm3-opts--2" id="pm3-q2">
-                <button type="button" class="pm3-opt" data-id="low">Меньше 2.5</button>
-                <button type="button" class="pm3-opt" data-id="high">Больше 2.5</button>
+              <div class="pm3-predict-q-title">${sport.q2Title}</div>
+              <div class="pm3-opts pm3-opts--${q2Options.length}" id="pm3-q2">
+                ${q2Options.map(o => `<button type="button" class="pm3-opt" data-id="${o.id}">${o.label}</button>`).join('')}
               </div>
             </div>
             <div class="pm3-predict-hint" id="pm3-hint">Сделай оба прогноза чтобы начать</div>
@@ -881,7 +930,6 @@ const UI = {
       this._showMatchStartBanner();
     };
 
-    // Animate bars in after render
     requestAnimationFrame(() => {
       screen.querySelectorAll('.pm3-bar-fill').forEach(el => {
         const w = el.style.width;
@@ -892,16 +940,16 @@ const UI = {
   },
 
   _showMatchStartBanner() {
-    // Reset event log
     this._matchEventLog = [];
+    const sport = this._getSportPresentation(Game.match.section);
 
-    const screen = this.showScreen(`
-      <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:linear-gradient(135deg,#0a1f0a,#1a3a1a);padding:32px;">
-        <div style="font-size:64px;animation:bounceLogo 0.8s ease-in-out infinite alternate;">⚽</div>
+    this.showScreen(`
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:${sport.heroBg};padding:32px;">
+        <div style="font-size:64px;animation:bounceLogo 0.8s ease-in-out infinite alternate;">${sport.icon}</div>
         <div style="font-size:26px;font-weight:900;color:#fff;letter-spacing:1px;">${T.phase1.matchStart}</div>
-        <div style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.5);">${Game.match.teamA.name} vs ${Game.match.teamB.name}</div>
+        <div style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.6);">${Game.match.teamA.name} vs ${Game.match.teamB.name}</div>
         <div style="display:flex;gap:12px;margin-top:4px;">
-          <div style="padding:5px 14px;background:rgba(88,204,2,0.15);border-radius:99px;font-size:11px;font-weight:800;color:#58CC02;text-transform:uppercase;">МАТЧ LIVE</div>
+          <div style="padding:5px 14px;background:rgba(255,255,255,0.12);border-radius:99px;font-size:11px;font-weight:800;color:#fff;text-transform:uppercase;">${sport.liveTag}</div>
         </div>
       </div>`);
 
@@ -1086,7 +1134,7 @@ const UI = {
   _lvStartIdle() {
     const st = this._lsState;
     if (!st) return;
-    const pos = Events.IDLE_POSITIONS;
+    const pos = Events.getIdlePositions(Game.match ? Game.match.section : 'football');
     st.idleTimer = setInterval(() => {
       if (!st || st.phase !== 'idle') return;
       st.idleIdx = (st.idleIdx + 1) % pos.length;
@@ -1294,7 +1342,7 @@ const UI = {
       setTimeout(() => flash.remove(), 600);
       const msg = document.createElement('div');
       msg.className = 'lv-goal-msg';
-      msg.textContent = 'ГОЛ!';
+      msg.textContent = this._getSportPresentation(Game.match.section).goalText;
       screen.querySelector('#lv-field').appendChild(msg);
       setTimeout(() => msg.remove(), 1400);
     }
