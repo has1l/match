@@ -2385,6 +2385,24 @@ button:active { transform: scale(0.97); }
   color: #fff;
 }
 
+/* --- Responsive wrappers --- */
+.pm3-hero-inner,
+.pm3-body-inner,
+.pm3-footer-inner {
+  width: min(100%, 1500px);
+  margin: 0 auto;
+}
+.pm3-body-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.pm3-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+}
+
 /* --- Hero --- */
 .pm3-hero {
   flex-shrink: 0;
@@ -2479,6 +2497,9 @@ button:active { transform: scale(0.97); }
   gap: 0;
   padding-bottom: 12px;
   -webkit-overflow-scrolling: touch;
+}
+.pm3-section--players {
+  overflow: hidden;
 }
 
 /* --- Win % bar --- */
@@ -4291,6 +4312,12 @@ button:active { transform: scale(0.97); }
 }
 
 /* --- Field wrap + field --- */
+.lv-stage {
+  width: 100%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
 .lv-field-wrap {
   flex-shrink: 0;
   width: 100%;
@@ -4312,16 +4339,12 @@ button:active { transform: scale(0.97); }
 }
 
 /* Hockey ice rink - replaces green field */
-.lv-field-wrap--hockey .lv-field {
+.lv-field-wrap--hockey .lv-field,
+.lv-field--hockey {
   background:
-    repeating-linear-gradient(
-      90deg,
-      rgba(180,220,255,0.06) 0px,
-      rgba(180,220,255,0.06) 1px,
-      transparent 1px,
-      transparent 28px
-    ),
-    linear-gradient(180deg, #c8e8f8 0%, #ddf0ff 40%, #c8e8f8 100%);
+    radial-gradient(circle at center, rgba(255,255,255,0.16), transparent 54%),
+    linear-gradient(180deg, rgba(140,180,220,0.15), rgba(60,90,120,0.05)),
+    linear-gradient(180deg, #d8edf8 0%, #c8e2f3 45%, #e7f5fb 100%);
 }
 
 .lv-field-svg {
@@ -4419,6 +4442,10 @@ button:active { transform: scale(0.97); }
 @keyframes ballRing {
   0%   { transform: scale(0.6); opacity: 0.7; }
   100% { transform: scale(2);   opacity: 0; }
+}
+.lv-ball--hockey {
+  font-size: 18px;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.35));
 }
 
 /* Event overlay card — positioned top-right area of field */

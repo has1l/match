@@ -694,6 +694,9 @@ const UI = {
           { label: 'Темп',    key: 'tempo' },
           { label: 'Форма',   key: 'formScore' },
         ],
+        compareTitle: 'СРАВНЕНИЕ ХАРАКТЕРИСТИК',
+        formTitle: 'ПОСЛЕДНИЕ 5 МАТЧЕЙ',
+        playersTitle: 'КЛЮЧЕВЫЕ ИГРОКИ',
         q1Title: '🏆 КТО ПОБЕДИТ?',
         q1Options: (teamA, teamB) => ([
           { id: 'A', label: teamA.shortName },
@@ -704,7 +707,10 @@ const UI = {
           { id: 'low', label: 'Меньше 5.5' },
           { id: 'high', label: 'Больше 5.5' },
         ],
+        hint: 'Сделай оба прогноза чтобы начать',
         playerStats: (p) => [`🥅${p.shot}`, `💨${p.speed}`],
+        resultWinnerLabel: 'Победитель',
+        resultTotalLabel: 'Тотал шайб',
       };
     }
     return {
@@ -719,6 +725,9 @@ const UI = {
         { label: 'Полузащита', key: 'midfield' },
         { label: 'Форма',      key: 'formScore' },
       ],
+      compareTitle: 'СРАВНЕНИЕ ХАРАКТЕРИСТИК',
+      formTitle: 'ПОСЛЕДНИЕ 5 МАТЧЕЙ',
+      playersTitle: 'КЛЮЧЕВЫЕ ИГРОКИ',
       q1Title: '🏆 КТО ПОБЕДИТ?',
       q1Options: (teamA, teamB) => ([
         { id: 'A',    label: teamA.shortName },
@@ -730,7 +739,10 @@ const UI = {
         { id: 'low', label: 'Меньше 2.5' },
         { id: 'high', label: 'Больше 2.5' },
       ],
+      hint: 'Сделай оба прогноза чтобы начать',
       playerStats: (p) => [`⚡${p.shot}`, `🏃${p.speed}`],
+      resultWinnerLabel: 'Победитель',
+      resultTotalLabel: 'Тотал голов',
     };
   },
 
@@ -801,94 +813,90 @@ const UI = {
     const q2Options = sport.q2Options;
 
     const screen = this.showScreen(`
-      <div class="pm3-root">
-
-        <!-- HERO -->
+      <div class="pm3-root pm3-root--${section}">
         <div class="pm3-hero" style="--ca:${teamA.color};--cb:${teamB.color}">
-          <button type="button" class="pm3-back-btn" id="pm3-back">←</button>
-          <div class="pm3-level-tag">УР.${levelNum} · ${sport.label}</div>
-          <div class="pm3-hero-teams">
-            <div class="pm3-hero-team pm3-hero-team--a">
-              <div class="pm3-hero-emoji">${teamA.emoji}</div>
-              <div class="pm3-hero-name">${teamA.name}</div>
-              <div class="pm3-hero-rating">★ ${teamA.rating}</div>
-            </div>
-            <div class="pm3-hero-vs">
-              <div class="pm3-hero-score">0 : 0</div>
-              <div class="pm3-hero-vs-label">VS</div>
-            </div>
-            <div class="pm3-hero-team pm3-hero-team--b">
-              <div class="pm3-hero-emoji">${teamB.emoji}</div>
-              <div class="pm3-hero-name">${teamB.name}</div>
-              <div class="pm3-hero-rating">★ ${teamB.rating}</div>
+          <div class="pm3-hero-inner">
+            <button type="button" class="pm3-back-btn" id="pm3-back">←</button>
+            <div class="pm3-level-tag">УР.${levelNum} · ${sport.label}</div>
+            <div class="pm3-hero-teams">
+              <div class="pm3-hero-team pm3-hero-team--a">
+                <div class="pm3-hero-emoji">${teamA.emoji}</div>
+                <div class="pm3-hero-name">${teamA.name}</div>
+                <div class="pm3-hero-rating">★ ${teamA.rating}</div>
+              </div>
+              <div class="pm3-hero-vs">
+                <div class="pm3-hero-score">0 : 0</div>
+                <div class="pm3-hero-vs-label">VS</div>
+              </div>
+              <div class="pm3-hero-team pm3-hero-team--b">
+                <div class="pm3-hero-emoji">${teamB.emoji}</div>
+                <div class="pm3-hero-name">${teamB.name}</div>
+                <div class="pm3-hero-rating">★ ${teamB.rating}</div>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- SCROLLABLE BODY -->
         <div class="pm3-body">
-
-          <!-- Win % -->
-          <div class="pm3-winpct-row">
-            <div class="pm3-winpct-bar" style="--wa:${teamA.winPct}%;--ca:${teamA.color};--cb:${teamB.color}">
-              <div class="pm3-winpct-a">${teamA.winPct}%</div>
-              <div class="pm3-winpct-sep">Победы</div>
-              <div class="pm3-winpct-b">${teamB.winPct}%</div>
-            </div>
-          </div>
-
-          <!-- Stats comparison -->
-          <div class="pm3-section">
-            <div class="pm3-section-title">СРАВНЕНИЕ ХАРАКТЕРИСТИК</div>
-            ${sport.stats.map(s => statBar(s.label, teamA[s.key], teamB[s.key])).join('')}
-          </div>
-
-          <!-- Form -->
-          <div class="pm3-section">
-            <div class="pm3-section-title">ПОСЛЕДНИЕ 5 МАТЧЕЙ</div>
-            <div class="pm3-form-row">
-              <span class="pm3-form-emoji">${teamA.emoji}</span>
-              <div class="pm3-form-dots">${formDots(teamA.form)}</div>
-            </div>
-            <div class="pm3-form-row">
-              <span class="pm3-form-emoji">${teamB.emoji}</span>
-              <div class="pm3-form-dots">${formDots(teamB.form)}</div>
-            </div>
-          </div>
-
-          <!-- Players -->
-          <div class="pm3-section">
-            <div class="pm3-section-title">КЛЮЧЕВЫЕ ИГРОКИ</div>
-            <div class="pm3-players-scroll">
-              ${teamA.players.slice(0, 2).map(p => playerCard(p, teamA)).join('')}
-              ${teamB.players.slice(0, 2).map(p => playerCard(p, teamB)).join('')}
-            </div>
-          </div>
-
-          <!-- Prediction card -->
-          <div class="pm3-predict-card">
-            <div class="pm3-predict-q">
-              <div class="pm3-predict-q-title">${sport.q1Title}</div>
-              <div class="pm3-opts pm3-opts--${q1Options.length}" id="pm3-q1">
-                ${q1Options.map(o => `<button type="button" class="pm3-opt" data-id="${o.id}">${o.label}</button>`).join('')}
+          <div class="pm3-body-inner">
+            <div class="pm3-winpct-row">
+              <div class="pm3-winpct-bar" style="--wa:${teamA.winPct}%;--ca:${teamA.color};--cb:${teamB.color}">
+                <div class="pm3-winpct-a">${teamA.winPct}%</div>
+                <div class="pm3-winpct-sep">Победы</div>
+                <div class="pm3-winpct-b">${teamB.winPct}%</div>
               </div>
             </div>
-            <div class="pm3-predict-q">
-              <div class="pm3-predict-q-title">${sport.q2Title}</div>
-              <div class="pm3-opts pm3-opts--${q2Options.length}" id="pm3-q2">
-                ${q2Options.map(o => `<button type="button" class="pm3-opt" data-id="${o.id}">${o.label}</button>`).join('')}
+
+            <div class="pm3-grid">
+              <div class="pm3-section">
+                <div class="pm3-section-title">${sport.compareTitle}</div>
+                ${sport.stats.map(s => statBar(s.label, teamA[s.key], teamB[s.key])).join('')}
+              </div>
+
+              <div class="pm3-section">
+                <div class="pm3-section-title">${sport.formTitle}</div>
+                <div class="pm3-form-row">
+                  <span class="pm3-form-emoji">${teamA.emoji}</span>
+                  <div class="pm3-form-dots">${formDots(teamA.form)}</div>
+                </div>
+                <div class="pm3-form-row">
+                  <span class="pm3-form-emoji">${teamB.emoji}</span>
+                  <div class="pm3-form-dots">${formDots(teamB.form)}</div>
+                </div>
+              </div>
+
+              <div class="pm3-section pm3-section--players">
+                <div class="pm3-section-title">${sport.playersTitle}</div>
+                <div class="pm3-players-scroll">
+                  ${teamA.players.slice(0, 2).map(p => playerCard(p, teamA)).join('')}
+                  ${teamB.players.slice(0, 2).map(p => playerCard(p, teamB)).join('')}
+                </div>
+              </div>
+
+              <div class="pm3-predict-card">
+                <div class="pm3-predict-q">
+                  <div class="pm3-predict-q-title">${sport.q1Title}</div>
+                  <div class="pm3-opts pm3-opts--${q1Options.length}" id="pm3-q1">
+                    ${q1Options.map(o => `<button type="button" class="pm3-opt" data-id="${o.id}">${o.label}</button>`).join('')}
+                  </div>
+                </div>
+                <div class="pm3-predict-q">
+                  <div class="pm3-predict-q-title">${sport.q2Title}</div>
+                  <div class="pm3-opts pm3-opts--${q2Options.length}" id="pm3-q2">
+                    ${q2Options.map(o => `<button type="button" class="pm3-opt" data-id="${o.id}">${o.label}</button>`).join('')}
+                  </div>
+                </div>
+                <div class="pm3-predict-hint" id="pm3-hint">${sport.hint}</div>
               </div>
             </div>
-            <div class="pm3-predict-hint" id="pm3-hint">Сделай оба прогноза чтобы начать</div>
           </div>
-
-        </div><!-- end body -->
-
-        <!-- FOOTER -->
-        <div class="pm3-footer">
-          <button type="button" class="pm3-start-btn" id="pm3-start" disabled>▶ НАЧАТЬ МАТЧ</button>
         </div>
 
+        <div class="pm3-footer">
+          <div class="pm3-footer-inner">
+            <button type="button" class="pm3-start-btn" id="pm3-start" disabled>▶ НАЧАТЬ МАТЧ</button>
+          </div>
+        </div>
       </div>`);
 
     let pickQ1 = null;
@@ -1063,10 +1071,9 @@ const UI = {
 
     const { teamA, teamB, section } = match;
     const sport = this._getSportPresentation(section);
-    const ballEmoji = section === 'hockey' ? '🏒' : '⚽';
 
     const screen = this.showScreen(`
-      <div class="lv-root">
+      <div class="lv-root lv-root--${section}">
         <div class="lv-topbar">
           <div class="lv-topbar-team">
             <span class="lv-topbar-emoji">${teamA.emoji}</span>
@@ -1075,7 +1082,7 @@ const UI = {
           </div>
           <div class="lv-topbar-center">
             <div class="lv-topbar-time" id="lv-time">0'</div>
-            <div class="lv-topbar-live"><span class="lv-live-dot"></span>LIVE</div>
+            <div class="lv-topbar-live"><span class="lv-live-dot"></span>${sport.liveTag}</div>
           </div>
           <div class="lv-topbar-team lv-topbar-team--right">
             <span class="lv-topbar-score" id="lv-score-b">0</span>
@@ -1084,15 +1091,18 @@ const UI = {
           </div>
         </div>
 
-        <div class="lv-field-wrap ${section === 'hockey' ? 'lv-field-wrap--hockey' : ''}">
-          <div class="lv-field" id="lv-field">
-            ${this._fieldSVG(section)}
-            <div id="lv-idle-players">${this._lvIdlePlayers(teamA, teamB)}</div>
-            <div id="lv-event-players"></div>
-            <div class="lv-ball" id="lv-ball" style="left:50%;top:50%">${ballEmoji}</div>
-            <div class="lv-field-card" id="lv-event-card" style="opacity:0;pointer-events:none;"></div>
+        <div class="lv-stage">
+          <div class="lv-field-wrap lv-field-wrap--${section}">
+            <div class="lv-field lv-field--${section}" id="lv-field">
+              ${this._fieldSVG(section)}
+              <div id="lv-idle-players">${this._lvIdlePlayers(teamA, teamB)}</div>
+              <div id="lv-event-players"></div>
+              <div class="lv-ball lv-ball--${section}" id="lv-ball" style="left:50%;top:50%">${sport.icon}</div>
+              <div class="lv-field-card" id="lv-event-card" style="opacity:0;pointer-events:none;"></div>
+            </div>
+            <div class="lv-timer-track"><div class="lv-timer-fill" id="lv-timer-fill" style="width:100%"></div></div>
           </div>
-          <div class="lv-timer-track"><div class="lv-timer-fill" id="lv-timer-fill" style="width:100%"></div></div>
+          <div id="lv-evlog-wrap">${this._renderEvLog()}</div>
         </div>
 
         <div class="lv-players-bar" id="lv-pbar" style="opacity:0;transition:opacity 0.3s;"></div>
@@ -1120,8 +1130,6 @@ const UI = {
           <span id="lv-ev-count">0 / ${match.liveEvents.length} · Ур.${match.levelNum}</span>
           <span id="lv-pts">⭐ 0 очков</span>
         </div>
-
-        <div id="lv-evlog-wrap"></div>
       </div>`);
 
     this._lsScreen = screen;
@@ -1137,24 +1145,35 @@ const UI = {
   },
 
   _lvIdlePlayers(teamA, teamB) {
-    const A = teamA.color, B = teamB.color;
-    const dots = [
-      // Team A: GK, 2 DEF, 2 MID, 1 FWD
-      { x:4,  y:50, c:A, gk:true  },
-      { x:22, y:27, c:A },
-      { x:22, y:73, c:A },
-      { x:40, y:40, c:A },
-      { x:40, y:60, c:A },
-      { x:57, y:50, c:A, fwd:true },
-      // Team B: GK, 2 DEF, 2 MID
-      { x:96, y:50, c:B, gk:true  },
-      { x:78, y:27, c:B },
-      { x:78, y:73, c:B },
-      { x:60, y:40, c:B },
-      { x:60, y:60, c:B },
-    ];
+    const section = Game.match && Game.match.section;
+    const A = teamA.color;
+    const B = teamB.color;
+    const dots = section === 'hockey'
+      ? [
+          { x: 7,  y: 50, c: A, gk: true },
+          { x: 24, y: 34, c: A }, { x: 24, y: 66, c: A },
+          { x: 42, y: 50, c: A },
+          { x: 58, y: 36, c: A, fwd: true }, { x: 58, y: 64, c: A, fwd: true },
+          { x: 93, y: 50, c: B, gk: true },
+          { x: 76, y: 34, c: B }, { x: 76, y: 66, c: B },
+          { x: 58, y: 50, c: B },
+          { x: 42, y: 36, c: B, fwd: true }, { x: 42, y: 64, c: B, fwd: true },
+        ]
+      : [
+          { x:4,  y:50, c:A, gk:true  },
+          { x:22, y:27, c:A },
+          { x:22, y:73, c:A },
+          { x:40, y:40, c:A },
+          { x:40, y:60, c:A },
+          { x:57, y:50, c:A, fwd:true },
+          { x:96, y:50, c:B, gk:true  },
+          { x:78, y:27, c:B },
+          { x:78, y:73, c:B },
+          { x:60, y:40, c:B },
+          { x:60, y:60, c:B },
+        ];
     return dots.map(d => {
-      const size = d.gk ? 18 : d.fwd ? 16 : 14;
+      const size = d.gk ? (section === 'hockey' ? 20 : 18) : d.fwd ? 18 : 15;
       return `<div class="lv-idlep" style="left:${d.x}%;top:${d.y}%;background:${d.c};width:${size}px;height:${size}px;margin-left:-${size/2}px;margin-top:-${size/2}px"></div>`;
     }).join('');
   },
@@ -1789,6 +1808,7 @@ const UI = {
     const p1s       = match.phase1Score;
     const p2s       = match.phase2Score;
     const { teamA, teamB, section, levelNum } = match;
+    const sport = this._getSportPresentation(section);
 
     // Final score from last event (or 0:0)
     const lastEvent = match.liveEvents[match.liveEvents.length - 1];
@@ -1815,8 +1835,8 @@ const UI = {
       p1html = `
         <div class="rs-section">
           <div class="rs-section-title">ПРЕДМАТЧЕВЫЙ ПРОГНОЗ</div>
-          ${mk(p1ans[0], 'Победитель')}
-          ${mk(p1ans[1], 'Тотал голов')}
+          ${mk(p1ans[0], sport.resultWinnerLabel)}
+          ${mk(p1ans[1], sport.resultTotalLabel)}
         </div>`;
     }
 
