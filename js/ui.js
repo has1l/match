@@ -961,7 +961,41 @@ const UI = {
   // =============================================
 
   // SVG field — HORIZONTAL play (left goal / right goal), viewBox 100×62
-  _fieldSVG() {
+  _fieldSVG(section) {
+    if (section === 'hockey') {
+      // Ice rink markings
+      return `<svg class="lv-field-svg lv-field-svg--hockey" viewBox="0 0 100 62" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Rink border with rounded corners -->
+        <rect x="1" y="1" width="98" height="60" rx="8" fill="none" stroke="rgba(180,220,255,0.6)" stroke-width="0.8"/>
+        <!-- Red center line -->
+        <line x1="50" y1="1" x2="50" y2="61" stroke="rgba(220,50,50,0.7)" stroke-width="0.9"/>
+        <!-- Blue lines (zones) -->
+        <line x1="32" y1="1" x2="32" y2="61" stroke="rgba(80,140,255,0.65)" stroke-width="0.8"/>
+        <line x1="68" y1="1" x2="68" y2="61" stroke="rgba(80,140,255,0.65)" stroke-width="0.8"/>
+        <!-- Center circle -->
+        <circle cx="50" cy="31" r="9" fill="none" stroke="rgba(220,50,50,0.5)" stroke-width="0.6"/>
+        <circle cx="50" cy="31" r="0.9" fill="rgba(220,50,50,0.8)"/>
+        <!-- Left faceoff circles -->
+        <circle cx="22" cy="18" r="5.5" fill="none" stroke="rgba(180,220,255,0.4)" stroke-width="0.55"/>
+        <circle cx="22" cy="44" r="5.5" fill="none" stroke="rgba(180,220,255,0.4)" stroke-width="0.55"/>
+        <!-- Right faceoff circles -->
+        <circle cx="78" cy="18" r="5.5" fill="none" stroke="rgba(180,220,255,0.4)" stroke-width="0.55"/>
+        <circle cx="78" cy="44" r="5.5" fill="none" stroke="rgba(180,220,255,0.4)" stroke-width="0.55"/>
+        <!-- Left goal crease -->
+        <rect x="1" y="22" width="10" height="18" rx="2" fill="rgba(80,140,255,0.12)" stroke="rgba(80,140,255,0.5)" stroke-width="0.6"/>
+        <!-- Left goal net -->
+        <rect x="-1" y="25" width="3" height="12" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.6)" stroke-width="0.6"/>
+        <!-- Right goal crease -->
+        <rect x="89" y="22" width="10" height="18" rx="2" fill="rgba(80,140,255,0.12)" stroke="rgba(80,140,255,0.5)" stroke-width="0.6"/>
+        <!-- Right goal net -->
+        <rect x="98" y="25" width="3" height="12" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.6)" stroke-width="0.6"/>
+        <!-- Left goal line -->
+        <line x1="11" y1="16" x2="11" y2="46" stroke="rgba(220,50,50,0.55)" stroke-width="0.55"/>
+        <!-- Right goal line -->
+        <line x1="89" y1="16" x2="89" y2="46" stroke="rgba(220,50,50,0.55)" stroke-width="0.55"/>
+      </svg>`;
+    }
+    // Football pitch
     return `<svg class="lv-field-svg" viewBox="0 0 100 62" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
       <!-- Border -->
       <rect x="1" y="1" width="98" height="60" fill="none" stroke="rgba(255,255,255,0.55)" stroke-width="0.7"/>
@@ -1027,7 +1061,9 @@ const UI = {
     this._matchEventLog = [];
     this._lsState = { phase: 'idle', idleTimer: null, idleIdx: 0, blocked: false };
 
-    const { teamA, teamB } = match;
+    const { teamA, teamB, section } = match;
+    const sport = this._getSportPresentation(section);
+    const ballEmoji = section === 'hockey' ? '🏒' : '⚽';
 
     const screen = this.showScreen(`
       <div class="lv-root">
@@ -1048,12 +1084,12 @@ const UI = {
           </div>
         </div>
 
-        <div class="lv-field-wrap">
+        <div class="lv-field-wrap ${section === 'hockey' ? 'lv-field-wrap--hockey' : ''}">
           <div class="lv-field" id="lv-field">
-            ${this._fieldSVG()}
+            ${this._fieldSVG(section)}
             <div id="lv-idle-players">${this._lvIdlePlayers(teamA, teamB)}</div>
             <div id="lv-event-players"></div>
-            <div class="lv-ball" id="lv-ball" style="left:50%;top:50%">⚽</div>
+            <div class="lv-ball" id="lv-ball" style="left:50%;top:50%">${ballEmoji}</div>
             <div class="lv-field-card" id="lv-event-card" style="opacity:0;pointer-events:none;"></div>
           </div>
           <div class="lv-timer-track"><div class="lv-timer-fill" id="lv-timer-fill" style="width:100%"></div></div>
@@ -1451,15 +1487,15 @@ const UI = {
         </div>
 
         <!-- FIELD -->
-        <div class="lv-field-wrap">
+        <div class="lv-field-wrap ${match.section === 'hockey' ? 'lv-field-wrap--hockey' : ''}">
           <div class="lv-field" id="lv-field">
-            ${this._fieldSVG()}
+            ${this._fieldSVG(match.section)}
 
             <!-- Players (appear during events) -->
             ${gkDot}${defDots}${attDot}
 
             <!-- Ball (animated from prev position) -->
-            <div class="lv-ball" id="lv-ball" style="left:${prev.x}%;top:${prev.y}%">⚽</div>
+            <div class="lv-ball" id="lv-ball" style="left:${prev.x}%;top:${prev.y}%">${match.section === 'hockey' ? '🏒' : '⚽'}</div>
 
             <!-- Event card overlay (hidden until ball arrives) -->
             <div class="lv-field-card" id="lv-field-card" style="opacity:0;">
