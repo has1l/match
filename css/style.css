@@ -6167,12 +6167,9 @@ button:active { transform: scale(0.97); }
   box-shadow: none;
 }
 
-/* CS2 live field SVG */
+/* CS2 live field SVG — transparent overlay, map image is in CSS background */
 .lv-field-svg--cs2 {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+  display: none;
 }
 
 /* prematch hero — CS2 */
@@ -6185,6 +6182,22 @@ button:active { transform: scale(0.97); }
   background: #0d1117;
 }
 
+/* CS2 field — big square map */
+.lv-field-wrap--esports .lv-field,
 .lv-field--esports {
-  background: #0d1117;
+  height: clamp(300px, 90vw, 500px);
+  background: url('../assets/img/maps/mirage.png') center/contain no-repeat, #0d1117;
+}
+
+/* player dots on CS2 map — bigger, more visible */
+.lv-field-wrap--esports .lv-idlep {
+  width: 10px;
+  height: 10px;
+  border-width: 2px;
+}
+
+.lv-field-wrap--esports .lv-evp {
+  width: 14px;
+  height: 14px;
+  border-width: 2px;
 }

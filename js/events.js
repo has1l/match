@@ -12,14 +12,14 @@ const Events = {
         'penalty', 'header', 'long_shot', 'one_on_one',
       ],
       typeMeta: {
-        attack:        { name: 'Острая атака', icon: '<img src="assets/img/events/football/attack.png" class="ev-icon-img" alt="⚡">' },
-        counterattack: { name: 'Контратака', icon: '<img src="assets/img/events/football/counterattack.png" class="ev-icon-img" alt="🏃">' },
-        corner:        { name: 'Угловой', icon: '🚩' },
-        free_kick:     { name: 'Штрафной', icon: '🎯' },
-        penalty:       { name: 'Пенальти', icon: '🥵' },
-        header:        { name: 'Удар головой', icon: '🦅' },
-        long_shot:     { name: 'Удар издали', icon: '💨' },
-        one_on_one:    { name: 'Один на один', icon: '🔥' },
+        attack:        { name: 'Острая атака',    icon: '<img src="assets/img/events/football/attack.png"        class="ev-icon-img" alt="⚡">' },
+        counterattack: { name: 'Контратака',      icon: '<img src="assets/img/events/football/counterattack.png" class="ev-icon-img" alt="🏃">' },
+        corner:        { name: 'Угловой',         icon: '<img src="assets/img/events/football/corner.png"        class="ev-icon-img" alt="🚩">' },
+        free_kick:     { name: 'Штрафной',        icon: '<img src="assets/img/events/football/free_kick.png"     class="ev-icon-img" alt="🎯">' },
+        penalty:       { name: 'Пенальти',        icon: '<img src="assets/img/events/football/penalty.png"       class="ev-icon-img" alt="🥵">' },
+        header:        { name: 'Удар головой',    icon: '<img src="assets/img/events/football/header.png"        class="ev-icon-img" alt="🦅">' },
+        long_shot:     { name: 'Удар издали',     icon: '<img src="assets/img/events/football/long_shot.png"     class="ev-icon-img" alt="💨">' },
+        one_on_one:    { name: 'Один на один',    icon: '<img src="assets/img/events/football/one_on_one.png"    class="ev-icon-img" alt="🔥">' },
       },
       answers: {
         attack:        { yes: 'Да, гол!', yesSub: 'Атака пройдёт', no: 'Нет, мимо', noSub: 'Защита выстоит' },
@@ -224,12 +224,12 @@ const Events = {
         'dangerous_attack', 'shot_on_goal', 'breakaway', 'rebound', 'power_play', 'one_timer',
       ],
       typeMeta: {
-        dangerous_attack: { name: 'Опасная атака', icon: '🏒' },
-        shot_on_goal:     { name: 'Бросок в створ', icon: '🎯' },
-        breakaway:        { name: 'Выход 1 на 1', icon: '⚡' },
-        rebound:          { name: 'Добивание', icon: '🥅' },
-        power_play:       { name: 'Большинство', icon: '➕' },
-        one_timer:        { name: 'One-timer', icon: '💥' },
+        dangerous_attack: { name: 'Опасная атака',  icon: '<img src="assets/img/events/hockey/dangerous_attack.png" class="ev-icon-img" alt="🏒">' },
+        shot_on_goal:     { name: 'Бросок в створ', icon: '<img src="assets/img/events/hockey/shot_on_goal.png"     class="ev-icon-img" alt="🎯">' },
+        breakaway:        { name: 'Выход 1 на 1',   icon: '<img src="assets/img/events/hockey/breakaway.png"        class="ev-icon-img" alt="⚡">' },
+        rebound:          { name: 'Добивание',       icon: '<img src="assets/img/events/hockey/rebound.png"          class="ev-icon-img" alt="🥅">' },
+        power_play:       { name: 'Большинство',     icon: '<img src="assets/img/events/hockey/power_play.png"       class="ev-icon-img" alt="➕">' },
+        one_timer:        { name: 'One-timer',       icon: '<img src="assets/img/events/hockey/one_timer.png"        class="ev-icon-img" alt="💥">' },
       },
       answers: {
         dangerous_attack: { yes: 'Да, шайба!', yesSub: 'Атака зайдёт', no: 'Нет, сейв', noSub: 'Оборона справится' },
@@ -432,60 +432,78 @@ const Events = {
         force_buy:    { yes: 'Да, выиграют!',     yesSub: 'Force buy сработает',      no: 'Нет, сольют',     noSub: 'Оружия не хватит' },
         site_take:    { yes: 'Да, захватят!',     yesSub: 'Сайт будет за ними',       no: 'Нет, отстоят',    noSub: 'CT выдержит атаку' },
       },
+      // Coordinates based on mirage.png (1024x1024):
+      // T spawn: right ~x88 y48 | CT spawn: left-bottom ~x28 y70
+      // B site: top-left ~x14 y22 | A site: bottom-center ~x50 y77 | Mid: ~x47 y48
       fieldLayouts: {
         pistol_round: {
-          gk: { x: 86, y: 31 },
-          defenders: [{ x: 72, y: 26 }, { x: 72, y: 36 }],
-          attacker: { x: 28, y: 31 },
-          ball: { x: 30, y: 31 },
+          // Both sides meet in mid at round start
+          gk:        { x: 38, y: 58 },
+          defenders: [{ x: 44, y: 52 }, { x: 32, y: 55 }],
+          attacker:  { x: 66, y: 50 },
+          ball:      { x: 64, y: 50 },
         },
         eco_upset: {
-          gk: { x: 83, y: 31 },
-          defenders: [{ x: 69, y: 25 }, { x: 71, y: 37 }],
-          attacker: { x: 38, y: 31 },
-          ball: { x: 40, y: 31 },
+          // T pushing B apps with pistols
+          gk:        { x: 18, y: 24 },
+          defenders: [{ x: 22, y: 20 }],
+          attacker:  { x: 36, y: 30 },
+          ball:      { x: 34, y: 29 },
         },
         awp_duel: {
-          gk: { x: 89, y: 31 },
+          // Mid sightline — T top mid vs CT window
+          gk:        { x: 32, y: 46 },
           defenders: [],
-          attacker: { x: 22, y: 31 },
-          ball: { x: 24, y: 31 },
+          attacker:  { x: 66, y: 47 },
+          ball:      { x: 64, y: 47 },
         },
         entry_frag: {
-          gk: { x: 80, y: 11 },
-          defenders: [{ x: 70, y: 8 }],
-          attacker: { x: 63, y: 10 },
-          ball: { x: 65, y: 10 },
+          // T entry fragging B short
+          gk:        { x: 16, y: 22 },
+          defenders: [{ x: 20, y: 18 }],
+          attacker:  { x: 28, y: 26 },
+          ball:      { x: 27, y: 25 },
         },
         bomb_plant: {
-          gk: { x: 83, y: 9 },
-          defenders: [{ x: 78, y: 14 }],
-          attacker: { x: 71, y: 9 },
-          ball: { x: 73, y: 9 },
+          // T planting at A site
+          gk:        { x: 42, y: 74 },
+          defenders: [{ x: 38, y: 78 }],
+          attacker:  { x: 50, y: 77 },
+          ball:      { x: 50, y: 77 },
         },
         clutch: {
-          gk: { x: 84, y: 8 },
-          defenders: [{ x: 75, y: 6 }, { x: 75, y: 14 }],
-          attacker: { x: 79, y: 10 },
-          ball: { x: 80, y: 9 },
+          // Post-plant 1vX on A site
+          gk:        { x: 44, y: 73 },
+          defenders: [{ x: 40, y: 77 }, { x: 48, y: 72 }],
+          attacker:  { x: 52, y: 76 },
+          ball:      { x: 51, y: 76 },
         },
         force_buy: {
-          gk: { x: 84, y: 31 },
-          defenders: [{ x: 71, y: 27 }, { x: 71, y: 35 }],
-          attacker: { x: 44, y: 31 },
-          ball: { x: 46, y: 31 },
+          // T force buy — mid window push
+          gk:        { x: 36, y: 48 },
+          defenders: [{ x: 30, y: 52 }],
+          attacker:  { x: 58, y: 47 },
+          ball:      { x: 56, y: 47 },
         },
         site_take: {
-          gk: { x: 82, y: 7 },
-          defenders: [{ x: 75, y: 4 }, { x: 79, y: 14 }],
-          attacker: { x: 66, y: 8 },
-          ball: { x: 68, y: 7 },
+          // Full B execute
+          gk:        { x: 12, y: 22 },
+          defenders: [{ x: 16, y: 18 }, { x: 18, y: 28 }],
+          attacker:  { x: 22, y: 24 },
+          ball:      { x: 21, y: 23 },
         },
       },
       idlePositions: [
-        { x: 14, y: 31 }, { x: 26, y: 27 }, { x: 38, y: 22 }, { x: 50, y: 31 }, { x: 62, y: 27 },
-        { x: 76, y: 20 }, { x: 85, y: 31 }, { x: 77, y: 42 }, { x: 64, y: 52 }, { x: 50, y: 42 },
-        { x: 37, y: 52 }, { x: 24, y: 37 }, { x: 42, y: 31 },
+        // T side / T spawn area
+        { x: 88, y: 48 }, { x: 78, y: 50 }, { x: 70, y: 54 },
+        // Mid
+        { x: 58, y: 46 }, { x: 47, y: 48 }, { x: 36, y: 50 },
+        // B side
+        { x: 26, y: 30 }, { x: 16, y: 22 },
+        // A side
+        { x: 60, y: 64 }, { x: 50, y: 77 },
+        // CT spawn area
+        { x: 28, y: 70 }, { x: 38, y: 66 }, { x: 44, y: 74 },
       ],
       ctNames: ['А. Кирпич', 'С. Щит', 'В. Стена', 'И. Форт', 'Д. Бункер'],
       tNames:  ['Г. Буря', 'Р. Штурм', 'Т. Пробой', 'Ф. Рывок', 'Н. Клин'],

@@ -1240,42 +1240,8 @@ const UI = {
   // SVG field — HORIZONTAL play (left goal / right goal), viewBox 100×62
   _fieldSVG(section) {
     if (section === 'esports') {
-      // CS2 map — top-down simplified view (T left, CT right, two bomb sites)
-      return `<svg class="lv-field-svg lv-field-svg--cs2" viewBox="0 0 100 62" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-        <!-- Map floor -->
-        <rect x="0" y="0" width="100" height="62" fill="#0d1117"/>
-        <!-- Outer border -->
-        <rect x="1" y="1" width="98" height="60" rx="2" fill="none" stroke="rgba(255,107,53,0.35)" stroke-width="0.6"/>
-        <!-- T Spawn (left) -->
-        <rect x="2" y="22" width="18" height="18" rx="1.5" fill="rgba(255,107,53,0.12)" stroke="rgba(255,107,53,0.55)" stroke-width="0.55"/>
-        <text x="11" y="32.5" text-anchor="middle" fill="rgba(255,107,53,0.85)" font-size="5" font-weight="bold">T</text>
-        <!-- CT Spawn (right) -->
-        <rect x="80" y="22" width="18" height="18" rx="1.5" fill="rgba(0,200,255,0.10)" stroke="rgba(0,200,255,0.55)" stroke-width="0.55"/>
-        <text x="89" y="32.5" text-anchor="middle" fill="rgba(0,200,255,0.85)" font-size="5" font-weight="bold">CT</text>
-        <!-- A Site (top-right) -->
-        <rect x="64" y="2" width="20" height="18" rx="1.5" fill="rgba(255,200,0,0.08)" stroke="rgba(255,200,0,0.55)" stroke-width="0.55"/>
-        <text x="74" y="13" text-anchor="middle" fill="rgba(255,200,0,0.9)" font-size="6" font-weight="bold">A</text>
-        <!-- B Site (bottom-right) -->
-        <rect x="64" y="42" width="20" height="18" rx="1.5" fill="rgba(255,200,0,0.08)" stroke="rgba(255,200,0,0.55)" stroke-width="0.55"/>
-        <text x="74" y="53" text-anchor="middle" fill="rgba(255,200,0,0.9)" font-size="6" font-weight="bold">B</text>
-        <!-- Mid area -->
-        <rect x="32" y="26" width="30" height="10" rx="1" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.18)" stroke-width="0.4"/>
-        <text x="47" y="32.5" text-anchor="middle" fill="rgba(255,255,255,0.35)" font-size="3.5">MID</text>
-        <!-- Connectors T to Mid -->
-        <line x1="20" y1="31" x2="32" y2="31" stroke="rgba(255,255,255,0.2)" stroke-width="0.4"/>
-        <!-- Mid to CT -->
-        <line x1="62" y1="31" x2="80" y2="31" stroke="rgba(255,255,255,0.2)" stroke-width="0.4"/>
-        <!-- T to A site path -->
-        <line x1="11" y1="22" x2="11" y2="11" stroke="rgba(255,107,53,0.25)" stroke-width="0.4"/>
-        <line x1="11" y1="11" x2="64" y2="11" stroke="rgba(255,107,53,0.25)" stroke-width="0.4"/>
-        <!-- T to B site path -->
-        <line x1="11" y1="40" x2="11" y2="51" stroke="rgba(255,107,53,0.25)" stroke-width="0.4"/>
-        <line x1="11" y1="51" x2="64" y2="51" stroke="rgba(255,107,53,0.25)" stroke-width="0.4"/>
-        <!-- CT to A site -->
-        <line x1="84" y1="22" x2="84" y2="20" stroke="rgba(0,200,255,0.25)" stroke-width="0.4"/>
-        <!-- CT to B site -->
-        <line x1="84" y1="40" x2="84" y2="42" stroke="rgba(0,200,255,0.25)" stroke-width="0.4"/>
-      </svg>`;
+      // Map background is set via CSS (mirage.png) — SVG not needed
+      return '';
     }
     if (section === 'hockey') {
       // Ice rink markings
