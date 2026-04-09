@@ -406,6 +406,228 @@ const Events = {
         return ['dangerous_attack', 'shot_on_goal', 'breakaway', 'rebound', 'power_play', 'one_timer'].includes(type);
       },
     },
+    esports: {
+      matchMinutes: 30,
+      eventTypes: [
+        'pistol_round', 'eco_upset', 'awp_duel', 'entry_frag',
+        'bomb_plant', 'clutch', 'force_buy', 'site_take',
+      ],
+      typeMeta: {
+        pistol_round: { name: 'Пистолетный раунд', icon: '🔫' },
+        eco_upset:    { name: 'Эко-раунд',          icon: '💸' },
+        awp_duel:     { name: 'AWP дуэль',           icon: '🎯' },
+        entry_frag:   { name: 'Entry фраг',          icon: '🚪' },
+        bomb_plant:   { name: 'Закладка бомбы',      icon: '💣' },
+        clutch:       { name: 'Клатч 1vX',           icon: '😤' },
+        force_buy:    { name: 'Force buy',           icon: '⚡' },
+        site_take:    { name: 'Захват сайта',         icon: '🏁' },
+      },
+      answers: {
+        pistol_round: { yes: 'Да, выиграют!',   yesSub: 'Пистолетный раунд за ними', no: 'Нет, проиграют', noSub: 'Противник сильнее' },
+        eco_upset:    { yes: 'Да, upset!',       yesSub: 'Эко-раунд на удивление',    no: 'Нет, не выйдет', noSub: 'Пистолеты не хватит' },
+        awp_duel:     { yes: 'Да, AWPер убьёт!', yesSub: 'Снайпер точнее',           no: 'Нет, переиграют', noSub: 'Рифл выиграет дуэль' },
+        entry_frag:   { yes: 'Да, войдут!',      yesSub: 'Entry зачистит угол',       no: 'Нет, не зайдут',  noSub: 'CT держит позицию' },
+        bomb_plant:   { yes: 'Да, посадят!',      yesSub: 'Успеют заложить бомбу',    no: 'Нет, не успеют',  noSub: 'CT закроет позицию' },
+        clutch:       { yes: 'Да, клатч!',        yesSub: 'Выиграет в меньшинстве',   no: 'Нет, проиграет',  noSub: 'Численное превосходство' },
+        force_buy:    { yes: 'Да, выиграют!',     yesSub: 'Force buy сработает',      no: 'Нет, сольют',     noSub: 'Оружия не хватит' },
+        site_take:    { yes: 'Да, захватят!',     yesSub: 'Сайт будет за ними',       no: 'Нет, отстоят',    noSub: 'CT выдержит атаку' },
+      },
+      fieldLayouts: {
+        pistol_round: {
+          gk: { x: 86, y: 31 },
+          defenders: [{ x: 72, y: 26 }, { x: 72, y: 36 }],
+          attacker: { x: 28, y: 31 },
+          ball: { x: 30, y: 31 },
+        },
+        eco_upset: {
+          gk: { x: 83, y: 31 },
+          defenders: [{ x: 69, y: 25 }, { x: 71, y: 37 }],
+          attacker: { x: 38, y: 31 },
+          ball: { x: 40, y: 31 },
+        },
+        awp_duel: {
+          gk: { x: 89, y: 31 },
+          defenders: [],
+          attacker: { x: 22, y: 31 },
+          ball: { x: 24, y: 31 },
+        },
+        entry_frag: {
+          gk: { x: 80, y: 11 },
+          defenders: [{ x: 70, y: 8 }],
+          attacker: { x: 63, y: 10 },
+          ball: { x: 65, y: 10 },
+        },
+        bomb_plant: {
+          gk: { x: 83, y: 9 },
+          defenders: [{ x: 78, y: 14 }],
+          attacker: { x: 71, y: 9 },
+          ball: { x: 73, y: 9 },
+        },
+        clutch: {
+          gk: { x: 84, y: 8 },
+          defenders: [{ x: 75, y: 6 }, { x: 75, y: 14 }],
+          attacker: { x: 79, y: 10 },
+          ball: { x: 80, y: 9 },
+        },
+        force_buy: {
+          gk: { x: 84, y: 31 },
+          defenders: [{ x: 71, y: 27 }, { x: 71, y: 35 }],
+          attacker: { x: 44, y: 31 },
+          ball: { x: 46, y: 31 },
+        },
+        site_take: {
+          gk: { x: 82, y: 7 },
+          defenders: [{ x: 75, y: 4 }, { x: 79, y: 14 }],
+          attacker: { x: 66, y: 8 },
+          ball: { x: 68, y: 7 },
+        },
+      },
+      idlePositions: [
+        { x: 14, y: 31 }, { x: 26, y: 27 }, { x: 38, y: 22 }, { x: 50, y: 31 }, { x: 62, y: 27 },
+        { x: 76, y: 20 }, { x: 85, y: 31 }, { x: 77, y: 42 }, { x: 64, y: 52 }, { x: 50, y: 42 },
+        { x: 37, y: 52 }, { x: 24, y: 37 }, { x: 42, y: 31 },
+      ],
+      ctNames: ['А. Кирпич', 'С. Щит', 'В. Стена', 'И. Форт', 'Д. Бункер'],
+      tNames:  ['Г. Буря', 'Р. Штурм', 'Т. Пробой', 'Ф. Рывок', 'Н. Клин'],
+      calcRating(team) {
+        return team.rifle * 0.30 + team.awp * 0.25 + team.utility * 0.20 + team.defense * 0.15 + team.formScore * 0.10;
+      },
+      getProb(atkRating, defRating, type) {
+        const bonus = {
+          pistol_round: -0.02,
+          eco_upset:    -0.16,
+          awp_duel:      0.05,
+          entry_frag:    0.02,
+          bomb_plant:    0.03,
+          clutch:       -0.08,
+          force_buy:    -0.05,
+          site_take:     0.04,
+        };
+        const base = 0.32 + (atkRating - defRating) * 0.0048 + (bonus[type] || 0);
+        return Events.clamp(base + Events.rand(-0.08, 0.08), 0.14, 0.82);
+      },
+      getOpp(type, defTeam) {
+        const isCT = ['entry_frag', 'bomb_plant', 'site_take', 'clutch'].includes(type);
+        const names = isCT ? this.ctNames : this.tNames;
+        const baseStat = isCT ? defTeam.defense : defTeam.rifle;
+        return {
+          name: Events.pick(names),
+          pos: isCT ? 'CT' : 'CT',
+          stat: Math.round(Events.clamp(baseStat + Events.rand(-6, 6), 40, 99)),
+          statName: 'защита',
+        };
+      },
+      getPlayerStat(player, type) {
+        if (type === 'awp_duel') return { name: 'AWP', val: Math.round(80 + (player.rating - 60) * 0.4) };
+        if (type === 'clutch')   return { name: 'KAST', val: player.kast };
+        return { name: 'рейтинг', val: player.rating };
+      },
+      getOutcomeLine(event) {
+        const p = event.player.name;
+        const o = event.opp.name;
+        if (event.correct === 'yes') {
+          const lines = {
+            pistol_round: [`${p} выиграл пистолетный раунд.`, `${event.attacker.name} взяли пистолет.`],
+            eco_upset:    [`Эко-раунд — неожиданный upset от ${p}!`, `${p} выиграл раунд с пистолетом.`],
+            awp_duel:     [`${p} снял противника точным выстрелом.`, `AWPер ${p} выиграл дуэль.`],
+            entry_frag:   [`${p} вошёл первым и зачистил угол.`, `${p} открыл сайт для команды.`],
+            bomb_plant:   [`${p} успел заложить бомбу.`, `Бомба посажена — ${event.attacker.name} в плюсе.`],
+            clutch:       [`${p} вытащил клатч!`, `Один против всех — ${p} справился.`],
+            force_buy:    [`Force buy ${event.attacker.name} сработал!`, `${p} выиграл раунд с SMG.`],
+            site_take:    [`${event.attacker.name} захватили сайт.`, `${p} провёл идеальный заход.`],
+          };
+          return Events.pick(lines[event.type] || lines.entry_frag);
+        }
+        const lines = {
+          pistol_round: [`${o} удержал позицию.`, `CT выиграл пистолетный раунд.`],
+          eco_upset:    [`${o} зачистил эко-раунд.`, `Rifles оказались сильнее.`],
+          awp_duel:     [`${o} переиграл AWPера.`, `${p} промахнулся.`],
+          entry_frag:   [`${o} держит угол.`, `${p} не прошёл вход.`],
+          bomb_plant:   [`${o} не дал заложить бомбу.`, `CT закрыл позицию вовремя.`],
+          clutch:       [`${o} не дал вытащить клатч.`, `Численное превосходство решило.`],
+          force_buy:    [`${o} сдержал force buy.`, `Rifles оказались сильнее SMG.`],
+          site_take:    [`${o} отстоял сайт.`, `CT выдержал штурм.`],
+        };
+        return Events.pick(lines[event.type] || lines.entry_frag);
+      },
+      getFeedback(correct, playerAnswer) {
+        if (correct && playerAnswer === 'yes') {
+          return Events.pick(['Верно! Раунд за атакой.', 'Точный прогноз — T side взяли раунд.', 'Отлично прочитал эпизод.']);
+        }
+        if (correct && playerAnswer === 'no') {
+          return Events.pick(['Верно. CT устояли.', 'Точный прогноз — CT выдержали.', 'Правильно, атака не прошла.']);
+        }
+        if (!correct && playerAnswer === 'yes') return 'Ошибка! Атака не прошла. −1 жизнь.';
+        return 'Ошибка! Раунд взяли атакующие. −1 жизнь.';
+      },
+      getTitle(type, attackerTeam) {
+        const map = {
+          pistol_round: () => `${attackerTeam.name}: пистолетный раунд!`,
+          eco_upset:    () => `${attackerTeam.name} идут на эко`,
+          awp_duel:     () => `AWP дуэль — ${attackerTeam.name}`,
+          entry_frag:   () => `${attackerTeam.name} врываются!`,
+          bomb_plant:   () => `${attackerTeam.name} закладывают бомбу`,
+          clutch:       () => `Клатч для ${attackerTeam.name}!`,
+          force_buy:    () => `${attackerTeam.name}: force buy!`,
+          site_take:    () => `${attackerTeam.name} идут на сайт!`,
+        };
+        return (map[type] || map.entry_frag)();
+      },
+      getText(type, attacker, defender, player) {
+        const p = player.name;
+        const d = defender.name;
+        const templates = {
+          pistol_round: [
+            `${attacker.name} начинают раунд с пистолетами, ${p} ищет открытие.`,
+            `${p} выходит с Glock/USP на коротком расстоянии.`,
+          ],
+          eco_upset: [
+            `${p} берёт пистолет против rifles — один шанс сделать upset.`,
+            `${attacker.name} экономят, но ${p} готов пойти ва-банк.`,
+          ],
+          awp_duel: [
+            `${p} встаёт с AWP в длинном коридоре против ${d}.`,
+            `AWPер ${attacker.name} держит пик — ${p} ждёт движения.`,
+          ],
+          entry_frag: [
+            `${p} первым врывается в угол ${d}.`,
+            `${attacker.name} заходят через дым, ${p} идёт первым.`,
+          ],
+          bomb_plant: [
+            `${p} пробегает к точке закладки под огнём ${d}.`,
+            `${attacker.name} вышли на сайт, ${p} ставит бомбу.`,
+          ],
+          clutch: [
+            `${p} остался один против нескольких из ${d}.`,
+            `Клатч-ситуация — ${p} должен разобраться со всеми.`,
+          ],
+          force_buy: [
+            `${attacker.name} покупают MP9/UMP, ${p} атакует с SMG.`,
+            `${p} идёт агрессивно с force buy против rifles ${d}.`,
+          ],
+          site_take: [
+            `${attacker.name} исполняют execute на сайт, ${p} ведёт заход.`,
+            `Гранаты летят, ${p} врывается первым через дым на сайт ${d}.`,
+          ],
+        };
+        return Events.pick(templates[type] || templates.entry_frag);
+      },
+      generateMatchResult(teamA, teamB) {
+        const rA = this.calcRating(teamA);
+        const rB = this.calcRating(teamB);
+        const diff = rA - rB;
+        const pA = Events.clamp(0.5 + diff * 0.006 + Events.rand(-0.05, 0.05), 0.15, 0.85);
+        return Math.random() < pA ? 'A' : 'B';
+      },
+      generateGoalTotal(teamA, teamB) {
+        const diff = Math.abs(this.calcRating(teamA) - this.calcRating(teamB));
+        const prob = Events.clamp(0.55 - diff * 0.008 + Events.rand(-0.05, 0.05), 0.20, 0.80);
+        return Math.random() < prob ? 'high' : 'low';
+      },
+      isScoringEvent(type) {
+        return ['pistol_round', 'eco_upset', 'awp_duel', 'entry_frag', 'bomb_plant', 'clutch', 'force_buy', 'site_take'].includes(type);
+      },
+    },
   },
 
   rand(min, max) { return min + Math.random() * (max - min); },
@@ -493,7 +715,9 @@ const Events = {
         layout,
         title: profile.getTitle(type, attacker),
         text: profile.getText(type, attacker, defender, player),
-        playerLine: `${section === 'hockey' ? 'С шайбой' : 'С мячом'} ${player.name} (${player.pos}, ${pStat.name} ${pStat.val}, скорость ${player.speed})`,
+        playerLine: section === 'esports'
+          ? `Играет ${player.name} (${player.pos}, ${pStat.name} ${pStat.val}, ADR ${player.adr})`
+          : `${section === 'hockey' ? 'С шайбой' : 'С мячом'} ${player.name} (${player.pos}, ${pStat.name} ${pStat.val}, скорость ${player.speed})`,
         oppLine: `Против него ${opp.name} (${opp.pos}, ${opp.statName} ${opp.stat})`,
         yesLabel: answers.yes,
         yesSub: answers.yesSub,

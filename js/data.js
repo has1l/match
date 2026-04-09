@@ -391,6 +391,196 @@ const HOCKEY_LEVELS = [
 ];
 
 // =============================================
+// CS2 TEAMS (12 teams)
+// =============================================
+const CS2_TEAMS = [
+  // --- TIER 1 ---
+  {
+    id: 'nova_force',
+    name: 'Nova Force',
+    shortName: 'NF',
+    color: '#FF6B35',
+    bgColor: '#1C0800',
+    emoji: '💥',
+    rifle: 92, awp: 89, utility: 86, defense: 83,
+    form: ['W','W','W','W','L'],
+    winPct: 73, scored: 16.3, conceded: 11.4,
+    players: [
+      { name: 'К. Ноябрев', pos: 'entry',   rating: 91, kast: 76, adr: 94, hs: 58 },
+      { name: 'Д. Файлов',  pos: 'awper',   rating: 88, kast: 72, adr: 82, hs: 32 },
+    ],
+  },
+  {
+    id: 'cyber_kings',
+    name: 'Cyber Kings',
+    shortName: 'CK',
+    color: '#00C8FF',
+    bgColor: '#001018',
+    emoji: '👑',
+    rifle: 90, awp: 86, utility: 88, defense: 85,
+    form: ['W','W','W','L','W'],
+    winPct: 70, scored: 16.1, conceded: 12.1,
+    players: [
+      { name: 'М. Сигнал',  pos: 'igl',     rating: 86, kast: 78, adr: 80, hs: 44 },
+      { name: 'Е. Прицел',  pos: 'awper',   rating: 89, kast: 71, adr: 84, hs: 29 },
+    ],
+  },
+  {
+    id: 'iron_pact',
+    name: 'Iron Pact',
+    shortName: 'IP',
+    color: '#FF9500',
+    bgColor: '#0F0800',
+    emoji: '⚙️',
+    rifle: 86, awp: 84, utility: 82, defense: 88,
+    form: ['W','W','L','W','W'],
+    winPct: 66, scored: 15.8, conceded: 12.7,
+    players: [
+      { name: 'А. Клин',    pos: 'rifler',  rating: 85, kast: 75, adr: 88, hs: 52 },
+      { name: 'С. Броня',   pos: 'support', rating: 81, kast: 79, adr: 74, hs: 41 },
+    ],
+  },
+  // --- TIER 2 ---
+  {
+    id: 'ghost_protocol',
+    name: 'Ghost Protocol',
+    shortName: 'GP',
+    color: '#CE82FF',
+    bgColor: '#0A0010',
+    emoji: '👻',
+    rifle: 82, awp: 80, utility: 84, defense: 79,
+    form: ['W','W','L','W','L'],
+    winPct: 61, scored: 15.4, conceded: 13.3,
+    players: [
+      { name: 'В. Фантом',  pos: 'lurker',  rating: 83, kast: 70, adr: 86, hs: 54 },
+      { name: 'Н. Дымов',   pos: 'support', rating: 79, kast: 76, adr: 72, hs: 39 },
+    ],
+  },
+  {
+    id: 'zero_hour',
+    name: 'Zero Hour',
+    shortName: 'ZH',
+    color: '#FF3B30',
+    bgColor: '#150000',
+    emoji: '⏰',
+    rifle: 79, awp: 82, utility: 76, defense: 75,
+    form: ['W','L','W','W','L'],
+    winPct: 58, scored: 15.1, conceded: 13.6,
+    players: [
+      { name: 'Г. Ноль',    pos: 'awper',   rating: 84, kast: 69, adr: 80, hs: 28 },
+      { name: 'Л. Рывок',   pos: 'entry',   rating: 78, kast: 72, adr: 90, hs: 62 },
+    ],
+  },
+  {
+    id: 'pixel_storm',
+    name: 'Pixel Storm',
+    shortName: 'PS',
+    color: '#30D158',
+    bgColor: '#001008',
+    emoji: '⚡',
+    rifle: 76, awp: 73, utility: 80, defense: 77,
+    form: ['W','L','W','L','W'],
+    winPct: 54, scored: 14.8, conceded: 13.9,
+    players: [
+      { name: 'Р. Вихрев',  pos: 'igl',     rating: 78, kast: 77, adr: 76, hs: 46 },
+      { name: 'И. Пиксель', pos: 'rifler',  rating: 80, kast: 73, adr: 84, hs: 55 },
+    ],
+  },
+  // --- TIER 3 ---
+  {
+    id: 'circuit_breakers',
+    name: 'Circuit Breakers',
+    shortName: 'CB',
+    color: '#FFD60A',
+    bgColor: '#100A00',
+    emoji: '🔌',
+    rifle: 72, awp: 70, utility: 74, defense: 71,
+    form: ['L','W','W','L','L'],
+    winPct: 48, scored: 14.2, conceded: 14.5,
+    players: [
+      { name: 'П. Ток',     pos: 'rifler',  rating: 74, kast: 68, adr: 78, hs: 49 },
+      { name: 'О. Схема',   pos: 'support', rating: 70, kast: 72, adr: 68, hs: 37 },
+    ],
+  },
+  {
+    id: 'neon_vortex',
+    name: 'Neon Vortex',
+    shortName: 'NV',
+    color: '#5E5CE6',
+    bgColor: '#030018',
+    emoji: '🌀',
+    rifle: 70, awp: 68, utility: 71, defense: 67,
+    form: ['L','L','W','W','L'],
+    winPct: 44, scored: 13.8, conceded: 14.8,
+    players: [
+      { name: 'Т. Вихрь',   pos: 'lurker',  rating: 72, kast: 66, adr: 80, hs: 56 },
+      { name: 'Ф. Неон',    pos: 'entry',   rating: 69, kast: 69, adr: 82, hs: 60 },
+    ],
+  },
+  {
+    id: 'rapid_squad',
+    name: 'Rapid Squad',
+    shortName: 'RS',
+    color: '#64D2FF',
+    bgColor: '#001018',
+    emoji: '🚀',
+    rifle: 67, awp: 65, utility: 68, defense: 64,
+    form: ['W','L','L','L','W'],
+    winPct: 40, scored: 13.4, conceded: 15.2,
+    players: [
+      { name: 'Е. Спринт',  pos: 'entry',   rating: 70, kast: 65, adr: 84, hs: 58 },
+      { name: 'А. Порыв',   pos: 'rifler',  rating: 66, kast: 67, adr: 76, hs: 48 },
+    ],
+  },
+  // --- TIER 4 ---
+  {
+    id: 'static_noise',
+    name: 'Static Noise',
+    shortName: 'SN',
+    color: '#8E8E93',
+    bgColor: '#0A0A0F',
+    emoji: '📡',
+    rifle: 63, awp: 60, utility: 62, defense: 61,
+    form: ['L','L','L','W','L'],
+    winPct: 34, scored: 12.8, conceded: 15.7,
+    players: [
+      { name: 'М. Шум',     pos: 'support', rating: 65, kast: 63, adr: 68, hs: 40 },
+      { name: 'В. Помеха',  pos: 'rifler',  rating: 62, kast: 61, adr: 72, hs: 45 },
+    ],
+  },
+  {
+    id: 'rookie_ops',
+    name: 'Rookie Ops',
+    shortName: 'RO',
+    color: '#FF453A',
+    bgColor: '#150000',
+    emoji: '🎮',
+    rifle: 58, awp: 55, utility: 58, defense: 57,
+    form: ['L','L','L','W','L'],
+    winPct: 28, scored: 12.2, conceded: 16.1,
+    players: [
+      { name: 'Н. Новичок', pos: 'entry',   rating: 60, kast: 58, adr: 70, hs: 44 },
+      { name: 'Б. Учёба',   pos: 'igl',     rating: 57, kast: 62, adr: 62, hs: 36 },
+    ],
+  },
+  {
+    id: 'last_boot',
+    name: 'Last Boot',
+    shortName: 'LB',
+    color: '#636366',
+    bgColor: '#080808',
+    emoji: '💾',
+    rifle: 54, awp: 51, utility: 54, defense: 53,
+    form: ['L','L','L','L','W'],
+    winPct: 22, scored: 11.5, conceded: 16.6,
+    players: [
+      { name: 'С. Лаг',     pos: 'rifler',  rating: 55, kast: 56, adr: 64, hs: 41 },
+      { name: 'Д. Краш',    pos: 'support', rating: 52, kast: 58, adr: 58, hs: 33 },
+    ],
+  },
+];
+
+// =============================================
 // COMPUTE DERIVED TEAM STATS
 // =============================================
 (function computeTeamStats() {
@@ -417,7 +607,39 @@ const HOCKEY_LEVELS = [
       t.formScore * 0.10
     );
   });
+  CS2_TEAMS.forEach(t => {
+    t.formScore = formScore(t.form);
+    t.rating = Math.round(
+      t.rifle   * 0.30 +
+      t.awp     * 0.25 +
+      t.utility * 0.20 +
+      t.defense * 0.15 +
+      t.formScore * 0.10
+    );
+  });
 })();
+
+// =============================================
+// CS2 LEVELS (12 levels)
+// =============================================
+const CS2_LEVELS = [
+  // --- EASY ---
+  { num: 1,  teamA: 'nova_force',       teamB: 'last_boot',        events: 5, winThreshold: 4, map: 'mirage' },
+  { num: 2,  teamA: 'cyber_kings',      teamB: 'rookie_ops',       events: 5, winThreshold: 4, map: 'dust2' },
+  { num: 3,  teamA: 'iron_pact',        teamB: 'static_noise',     events: 5, winThreshold: 4, map: 'inferno' },
+  // --- MEDIUM ---
+  { num: 4,  teamA: 'nova_force',       teamB: 'neon_vortex',      events: 6, winThreshold: 6, map: 'ancient' },
+  { num: 5,  teamA: 'cyber_kings',      teamB: 'rapid_squad',      events: 6, winThreshold: 6, map: 'nuke' },
+  { num: 6,  teamA: 'iron_pact',        teamB: 'circuit_breakers', events: 6, winThreshold: 6, map: 'overpass' },
+  // --- HARD ---
+  { num: 7,  teamA: 'ghost_protocol',   teamB: 'pixel_storm',      events: 7, winThreshold: 6, map: 'vertigo' },
+  { num: 8,  teamA: 'zero_hour',        teamB: 'iron_pact',        events: 7, winThreshold: 6, map: 'mirage' },
+  { num: 9,  teamA: 'nova_force',       teamB: 'ghost_protocol',   events: 7, winThreshold: 6, map: 'dust2' },
+  // --- EXPERT ---
+  { num: 10, teamA: 'nova_force',       teamB: 'cyber_kings',      events: 8, winThreshold: 8, map: 'inferno' },
+  { num: 11, teamA: 'iron_pact',        teamB: 'ghost_protocol',   events: 8, winThreshold: 8, map: 'nuke' },
+  { num: 12, teamA: 'zero_hour',        teamB: 'cyber_kings',      events: 8, winThreshold: 8, map: 'ancient' },
+];
 
 // =============================================
 // FOOTBALL LEVELS (12 levels)
@@ -473,12 +695,12 @@ const SECTIONS = {
     id: 'esports',
     name: T.sections.esports,
     desc: T.sections.esportsDesc,
-    icon: '🎮',
+    icon: '🎯',
     iconClass: 'esports',
-    teams: [],
-    levels: [],
-    unlockScore: 80,
-    unlockSection: 'hockey',
+    teams: CS2_TEAMS,
+    levels: CS2_LEVELS,
+    unlockScore: 0,
+    unlockSection: null,
     maxScore: 120,
   },
 };

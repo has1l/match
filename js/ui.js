@@ -282,10 +282,10 @@ const UI = {
                 <div class="hub-mode-desc">${hockeyUnlocked ? 'Симулятор хоккейных матчей' : T.menuHub.hockeySoon}</div>
               </button>
               <button type="button" class="hub-mode-card hub-mode-card--esports ${esUnlocked ? 'hub-mode-card--unlocked' : 'hub-mode-card--locked'}" data-section="esports" ${esUnlocked ? '' : 'disabled'}>
-                <span class="hub-mode-badge hub-mode-badge--dim">${esUnlocked ? T.menuHub.available : T.menuHub.soon}</span>
-                <div class="hub-mode-visual">🎮</div>
+                <span class="hub-mode-badge">${esUnlocked ? T.menuHub.available : T.menuHub.soon}</span>
+                <div class="hub-mode-visual">🎯</div>
                 <div class="hub-mode-name">${SECTIONS.esports.name}</div>
-                <div class="hub-mode-desc">${esUnlocked ? T.menuHub.footballSim : T.menuHub.esportsDev}</div>
+                <div class="hub-mode-desc">${esUnlocked ? 'Counter-Strike 2' : T.menuHub.esportsDev}</div>
               </button>
             </div>
             <button type="button" class="hub-cta" id="hub-btn-start"><span>${T.menuHub.startGame}</span><span class="hub-cta-arrow">›</span></button>
@@ -636,6 +636,11 @@ const UI = {
       return;
     }
 
+    if (section === 'esports') {
+      this._showCS2LevelMap(section, cfg, levels);
+      return;
+    }
+
     const nodes = levels.map((lvl, i) => {
       const rec = Game.getLevelRecord(section, lvl.num);
       const stars = rec ? rec.stars : 0;
@@ -802,7 +807,144 @@ const UI = {
     syncNodes();
   },
 
+  _showCS2LevelMap(section, cfg, levels) {
+    const score = Game.getSectionScore(section);
+    const totalStars = levels.reduce((s, lvl) => s + (Game.getLevelRecord(section, lvl.num)?.stars || 0), 0);
+    const firstUnlocked = levels.find(lvl => Game.isLevelUnlocked(section, lvl.num));
+    let selectedLevel = firstUnlocked ? firstUnlocked.num : levels[0].num;
+
+    const mapIcons = { mirage: '🏙️', dust2: '🏜️', inferno: '🔥', ancient: '🏛️', nuke: '☢️', overpass: '🌉', vertigo: '🏗️' };
+    const zigzagX = (idx) => {
+      const xs = [22, 78, 22, 78, 22, 78, 50];
+      return xs[idx % xs.length];
+    };
+    const nodesData = levels.map((lvl, idx) => ({ lvl, idx, top: 72 + idx * 102, left: zigzagX(idx) }));
+    const rinkHeight = Math.max(620, (levels.length - 1) * 102 + 170);
+    const pathPoints = nodesData.map((n, i) => `${i === 0 ? 'M' : 'L'} ${n.left} ${n.top}`).join(' ');
+
+    const nodes = nodesData.map(({ lvl, top, left }) => {
+      const rec = Game.getLevelRecord(section, lvl.num);
+      const stars = rec ? rec.stars : 0;
+      const unlocked = Game.isLevelUnlocked(section, lvl.num);
+      const mapName = (T.cs2.mapNames[lvl.map] || lvl.map).toUpperCase();
+      const mapIcon = mapIcons[lvl.map] || '🗺️';
+      const starsHtml = [1, 2, 3].map(s => `<span class="cs2-node-star ${s <= stars ? 'on' : ''}">★</span>`).join('');
+      return `
+        <button type="button" class="cs2-node ${unlocked ? 'cs2-node--open' : 'cs2-node--locked'} ${stars === 3 ? 'cs2-node--perfect' : ''}"
+          data-level="${lvl.num}" data-section="${section}" data-unlocked="${unlocked ? '1' : '0'}"
+          style="top:${top}px;left:${left}%" ${unlocked ? '' : 'disabled'}>
+          <span class="cs2-node-icon">${unlocked ? mapIcon : '🔒'}</span>
+          <span class="cs2-node-num">${unlocked ? lvl.num : ''}</span>
+          <span class="cs2-node-map">${unlocked ? mapName : ''}</span>
+          <span class="cs2-node-stars">${starsHtml}</span>
+        </button>`;
+    }).join('');
+
+    const screen = this.showScreen(`
+      <div class="cs2-map-root">
+        <div class="cs2-map-bg" aria-hidden="true"></div>
+        <div class="cs2-map-header">
+          <button class="cs2-map-back" id="cs2-back">‹</button>
+          <div class="cs2-map-header-center">
+            <span class="cs2-map-header-icon">🎯</span>
+            <span class="cs2-map-header-title">${cfg.name}</span>
+          </div>
+          <div class="cs2-map-header-score">
+            <span class="cs2-map-pts">${score}</span>
+            <span class="cs2-map-max">/ ${cfg.maxScore}</span>
+          </div>
+        </div>
+        <div class="cs2-map-starprog">
+          ${[...Array(36)].map((_, i) => `<span class="cs2-sp-dot ${i < totalStars ? 'on' : ''}"></span>`).join('')}
+        </div>
+        <div class="cs2-map-meta">
+          <div class="cs2-map-meta-title">${T.cs2.mapBanner}</div>
+          <div class="cs2-map-meta-sub">${T.cs2.mapSub}</div>
+        </div>
+        <div class="cs2-map-scroll">
+          <div class="cs2-map-track" style="height:${rinkHeight}px">
+            <svg class="cs2-map-path" viewBox="0 0 100 ${rinkHeight}" preserveAspectRatio="none" aria-hidden="true">
+              <path d="${pathPoints}" fill="none" stroke="rgba(255,107,53,0.6)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="12 14"/>
+              <path d="${pathPoints}" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            ${nodes}
+          </div>
+        </div>
+        <div class="cs2-map-bottom">
+          <button type="button" class="cs2-map-ad" id="cs2-ad">🎬 +❤️ Бонус</button>
+          <button type="button" class="cs2-map-start" id="cs2-start">▶ ИГРАТЬ</button>
+        </div>
+      </div>`);
+
+    const syncNodes = () => {
+      screen.querySelectorAll('.cs2-node').forEach((btn) => {
+        const lv = parseInt(btn.dataset.level, 10);
+        const unlocked = btn.dataset.unlocked === '1';
+        btn.classList.toggle('cs2-node--selected', unlocked && lv === selectedLevel);
+      });
+      const startBtn = screen.querySelector('#cs2-start');
+      const canStart = Game.isLevelUnlocked(section, selectedLevel);
+      startBtn.disabled = !canStart;
+      startBtn.textContent = canStart ? `▶ УРОВЕНЬ ${selectedLevel}` : '🔒 ЗАБЛОКИРОВАНО';
+    };
+
+    screen.querySelectorAll('.cs2-node').forEach((btn) => {
+      btn.onclick = () => {
+        if (btn.dataset.unlocked !== '1') return;
+        selectedLevel = parseInt(btn.dataset.level, 10);
+        syncNodes();
+      };
+    });
+
+    screen.querySelector('#cs2-start').onclick = () => {
+      if (Game.isLevelUnlocked(section, selectedLevel)) this.showPreMatch(section, selectedLevel);
+    };
+    screen.querySelector('#cs2-back').onclick = () => this.goBack();
+    screen.querySelector('#cs2-ad').onclick = () => {
+      if (!SDK.canShowRewardedAd('level_map_ad')) {
+        this._hubToast(screen, T.menuHub.dailyDone);
+        return;
+      }
+      SDK.showRewardedAd(() => { SDK.markAdUsed('level_map_ad'); Game.grantMenuAdBonus(); this._hubToast(screen, T.levels.adBonusToast); }, () => {});
+    };
+
+    syncNodes();
+  },
+
   _getSportPresentation(section) {
+    if (section === 'esports') {
+      return {
+        label: 'CS2',
+        icon: '🎯',
+        liveTag: 'CS2 LIVE',
+        goalText: 'РАУНД!',
+        heroBg: 'linear-gradient(135deg,#0a0f1a,#0f1a2e)',
+        stats: [
+          { label: 'Винтовка', key: 'rifle' },
+          { label: 'AWP',      key: 'awp' },
+          { label: 'Утилити',  key: 'utility' },
+          { label: 'Защита',   key: 'defense' },
+          { label: 'Форма',    key: 'formScore' },
+        ],
+        compareTitle: 'СРАВНЕНИЕ ХАРАКТЕРИСТИК',
+        formTitle: 'ПОСЛЕДНИЕ 5 МАТЧЕЙ',
+        playersTitle: 'КЛЮЧЕВЫЕ ИГРОКИ',
+        q1Title: '🎯 КТО ВЫИГРАЕТ КАРТУ?',
+        q1Options: (teamA, teamB) => ([
+          { id: 'A', label: teamA.shortName },
+          { id: 'B', label: teamB.shortName },
+        ]),
+        q2Title: '🔢 ТОТАЛ РАУНДОВ',
+        q2Options: [
+          { id: 'low',  label: 'Меньше 26.5' },
+          { id: 'high', label: 'Больше 26.5' },
+        ],
+        hint: 'Сделай оба прогноза чтобы начать',
+        playerStats: (p) => [`⭐${p.rating}`, `🎯${p.hs}%HS`],
+        resultWinnerLabel: 'Победитель карты',
+        resultTotalLabel: 'Тотал раундов',
+      };
+    }
     if (section === 'hockey') {
       return {
         label: 'ХОККЕЙ',
@@ -890,6 +1032,10 @@ const UI = {
     Game.startLevel(section, levelNum);
     const { teamA, teamB } = Game.match;
     const sport = this._getSportPresentation(section);
+    const levelCfg = SECTIONS[section] && SECTIONS[section].levels.find(l => l.num === levelNum);
+    const mapLabel = section === 'esports' && levelCfg && levelCfg.map
+      ? ` · ${T.cs2.mapNames[levelCfg.map] || levelCfg.map}`
+      : '';
 
     const statBar = (label, a, b) => {
       const total = Math.max(a + b, 1);
@@ -940,7 +1086,7 @@ const UI = {
         <div class="pm3-hero pm3-hero--${section}" style="--ca:${teamA.color};--cb:${teamB.color}">
           <div class="pm3-hero-inner">
             <button type="button" class="pm3-back-btn" id="pm3-back">←</button>
-            <div class="pm3-level-tag">УР.${levelNum} · ${sport.label}</div>
+            <div class="pm3-level-tag">УР.${levelNum} · ${sport.label}${mapLabel}</div>
             <div class="pm3-hero-teams">
               <div class="pm3-hero-team pm3-hero-team--a">
                 <div class="pm3-hero-emoji">${this._teamLogoHtml(section, teamA)}</div>
@@ -1093,6 +1239,44 @@ const UI = {
 
   // SVG field — HORIZONTAL play (left goal / right goal), viewBox 100×62
   _fieldSVG(section) {
+    if (section === 'esports') {
+      // CS2 map — top-down simplified view (T left, CT right, two bomb sites)
+      return `<svg class="lv-field-svg lv-field-svg--cs2" viewBox="0 0 100 62" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Map floor -->
+        <rect x="0" y="0" width="100" height="62" fill="#0d1117"/>
+        <!-- Outer border -->
+        <rect x="1" y="1" width="98" height="60" rx="2" fill="none" stroke="rgba(255,107,53,0.35)" stroke-width="0.6"/>
+        <!-- T Spawn (left) -->
+        <rect x="2" y="22" width="18" height="18" rx="1.5" fill="rgba(255,107,53,0.12)" stroke="rgba(255,107,53,0.55)" stroke-width="0.55"/>
+        <text x="11" y="32.5" text-anchor="middle" fill="rgba(255,107,53,0.85)" font-size="5" font-weight="bold">T</text>
+        <!-- CT Spawn (right) -->
+        <rect x="80" y="22" width="18" height="18" rx="1.5" fill="rgba(0,200,255,0.10)" stroke="rgba(0,200,255,0.55)" stroke-width="0.55"/>
+        <text x="89" y="32.5" text-anchor="middle" fill="rgba(0,200,255,0.85)" font-size="5" font-weight="bold">CT</text>
+        <!-- A Site (top-right) -->
+        <rect x="64" y="2" width="20" height="18" rx="1.5" fill="rgba(255,200,0,0.08)" stroke="rgba(255,200,0,0.55)" stroke-width="0.55"/>
+        <text x="74" y="13" text-anchor="middle" fill="rgba(255,200,0,0.9)" font-size="6" font-weight="bold">A</text>
+        <!-- B Site (bottom-right) -->
+        <rect x="64" y="42" width="20" height="18" rx="1.5" fill="rgba(255,200,0,0.08)" stroke="rgba(255,200,0,0.55)" stroke-width="0.55"/>
+        <text x="74" y="53" text-anchor="middle" fill="rgba(255,200,0,0.9)" font-size="6" font-weight="bold">B</text>
+        <!-- Mid area -->
+        <rect x="32" y="26" width="30" height="10" rx="1" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.18)" stroke-width="0.4"/>
+        <text x="47" y="32.5" text-anchor="middle" fill="rgba(255,255,255,0.35)" font-size="3.5">MID</text>
+        <!-- Connectors T to Mid -->
+        <line x1="20" y1="31" x2="32" y2="31" stroke="rgba(255,255,255,0.2)" stroke-width="0.4"/>
+        <!-- Mid to CT -->
+        <line x1="62" y1="31" x2="80" y2="31" stroke="rgba(255,255,255,0.2)" stroke-width="0.4"/>
+        <!-- T to A site path -->
+        <line x1="11" y1="22" x2="11" y2="11" stroke="rgba(255,107,53,0.25)" stroke-width="0.4"/>
+        <line x1="11" y1="11" x2="64" y2="11" stroke="rgba(255,107,53,0.25)" stroke-width="0.4"/>
+        <!-- T to B site path -->
+        <line x1="11" y1="40" x2="11" y2="51" stroke="rgba(255,107,53,0.25)" stroke-width="0.4"/>
+        <line x1="11" y1="51" x2="64" y2="51" stroke="rgba(255,107,53,0.25)" stroke-width="0.4"/>
+        <!-- CT to A site -->
+        <line x1="84" y1="22" x2="84" y2="20" stroke="rgba(0,200,255,0.25)" stroke-width="0.4"/>
+        <!-- CT to B site -->
+        <line x1="84" y1="40" x2="84" y2="42" stroke="rgba(0,200,255,0.25)" stroke-width="0.4"/>
+      </svg>`;
+    }
     if (section === 'hockey') {
       // Ice rink markings
       return `<svg class="lv-field-svg lv-field-svg--hockey" viewBox="0 0 100 62" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
