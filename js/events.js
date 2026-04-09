@@ -12,8 +12,8 @@ const Events = {
         'penalty', 'header', 'long_shot', 'one_on_one',
       ],
       typeMeta: {
-        attack:        { name: 'Острая атака', icon: '⚡' },
-        counterattack: { name: 'Контратака', icon: '🏃' },
+        attack:        { name: 'Острая атака', icon: '<img src="assets/img/events/football/attack.png" class="ev-icon-img" alt="⚡">' },
+        counterattack: { name: 'Контратака', icon: '<img src="assets/img/events/football/counterattack.png" class="ev-icon-img" alt="🏃">' },
         corner:        { name: 'Угловой', icon: '🚩' },
         free_kick:     { name: 'Штрафной', icon: '🎯' },
         penalty:       { name: 'Пенальти', icon: '🥵' },

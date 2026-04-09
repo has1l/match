@@ -62,7 +62,7 @@ const UI = {
     const backBtn = back ? `<button class="btn-back" id="btn-back">‹</button>` : `<div style="width:40px"></div>`;
     const livesHtml = lives !== null ? `
       <div class="header-lives">
-        ${[1,2,3].map(i => `<span class="heart-icon ${i > lives ? 'lost' : ''}">❤️</span>`).join('')}
+        ${[1,2,3].map(i => `<span class="heart-icon ${i > lives ? 'lost' : ''}"><img src="assets/img/ui/heart_full.png" class="heart-img" alt="❤"></span>`).join('')}
       </div>` : '';
     const streakHtml = streak ? `<span class="streak-badge">🔥 ${streak}</span>` : '';
 
@@ -77,6 +77,19 @@ const UI = {
 
   afterRender(el, cb) {
     requestAnimationFrame(() => cb(el));
+  },
+
+  // ---- Team logo helpers ----
+  _imgErr(el) {
+    const team = getTeamById(el.dataset.section, el.dataset.id);
+    const span = document.createElement('span');
+    span.className = 'team-logo-fb';
+    span.textContent = team ? team.emoji : '?';
+    el.replaceWith(span);
+  },
+
+  _teamLogoHtml(section, team) {
+    return `<img class="team-logo-img" src="assets/img/teams/${section}/${team.id}.png" alt="${team.name}" data-section="${section}" data-id="${team.id}" onerror="UI._imgErr(this)">`;
   },
 
   // =============================================
@@ -502,15 +515,19 @@ const UI = {
         </button>`;
     }).join('');
 
+    const sectionClass = section === 'hockey' ? 'lvl-foot-root lvl-foot-root--hockey' : 'lvl-foot-root';
+    const headerIcon = section === 'hockey' ? '🏒' : '⚽';
+    const pathFill = section === 'hockey' ? 'rgba(92, 190, 255, 0.28)' : 'rgba(88,204,2,0.25)';
+    const pathStroke = section === 'hockey' ? 'rgba(233,247,255,0.78)' : 'rgba(255,255,255,0.55)';
     const screen = this.showScreen(`
-      <div class="lvl-foot-root">
+      <div class="${sectionClass}">
         <div class="lvl-foot-bg" aria-hidden="true"></div>
 
         <!-- Header -->
         <div class="lvl-foot-header">
           <button class="lvl-foot-header-back" id="lvl-foot-back">‹</button>
           <div class="lvl-foot-header-center">
-            <span class="lvl-foot-header-icon">⚽</span>
+            <span class="lvl-foot-header-icon">${headerIcon}</span>
             <span class="lvl-foot-header-title">${cfg.name}</span>
           </div>
           <div class="lvl-foot-header-score">
@@ -534,9 +551,9 @@ const UI = {
                   <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
                 </filter>
               </defs>
-              <path d="${path.d}" fill="none" stroke="rgba(88,204,2,0.25)" stroke-width="14"
+              <path d="${path.d}" fill="none" stroke="${pathFill}" stroke-width="14"
                 stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
-              <path class="lvl-foot-path" d="${path.d}" fill="none" stroke="rgba(255,255,255,0.55)" stroke-width="2.5"
+              <path class="lvl-foot-path" d="${path.d}" fill="none" stroke="${pathStroke}" stroke-width="2.5"
                 stroke-dasharray="8 12" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
             </svg>
             ${tierLabels}
@@ -614,6 +631,11 @@ const UI = {
       return;
     }
 
+    if (section === 'hockey') {
+      this._showHockeyLevelMap(section, cfg, levels);
+      return;
+    }
+
     const nodes = levels.map((lvl, i) => {
       const rec = Game.getLevelRecord(section, lvl.num);
       const stars = rec ? rec.stars : 0;
@@ -677,6 +699,107 @@ const UI = {
         this.showPreMatch(sec, lvlNum);
       };
     });
+  },
+
+  _showHockeyLevelMap(section, cfg, levels) {
+    const score = Game.getSectionScore(section);
+    const totalStars = levels.reduce((s, lvl) => s + (Game.getLevelRecord(section, lvl.num)?.stars || 0), 0);
+    const firstUnlocked = levels.find(lvl => Game.isLevelUnlocked(section, lvl.num));
+    let selectedLevel = firstUnlocked ? firstUnlocked.num : levels[0].num;
+    const zigzagX = (idx) => {
+      const xs = [22, 78, 22, 78, 22, 78, 50];
+      return xs[idx % xs.length];
+    };
+    const nodesData = levels.map((lvl, idx) => {
+      const top = 72 + idx * 102;
+      const left = zigzagX(idx);
+      return { lvl, idx, top, left };
+    });
+    const rinkHeight = Math.max(620, (levels.length - 1) * 102 + 170);
+    const pathPoints = nodesData.map((n, i) => `${i === 0 ? 'M' : 'L'} ${n.left} ${n.top}`).join(' ');
+    const nodes = nodesData.map(({ lvl, top, left }) => {
+      const rec = Game.getLevelRecord(section, lvl.num);
+      const stars = rec ? rec.stars : 0;
+      const unlocked = Game.isLevelUnlocked(section, lvl.num);
+      const starsHtml = [1, 2, 3].map(s => `<span class="hock-node-star ${s <= stars ? 'on' : 'off'}">★</span>`).join('');
+      return `
+        <button type="button" class="hock-node ${unlocked ? 'hock-node--open' : 'hock-node--locked'} ${stars === 3 ? 'hock-node--perfect' : ''}" data-level="${lvl.num}" data-section="${section}" data-unlocked="${unlocked ? '1' : '0'}" style="top:${top}px;left:${left}%" ${unlocked ? '' : 'disabled'}>
+          <span class="hock-node-inner">${unlocked ? (stars === 3 ? '✓' : lvl.num) : '🔒'}</span>
+          <span class="hock-node-stars">${starsHtml}</span>
+        </button>`;
+    }).join('');
+
+    const screen = this.showScreen(`
+      <div class="lvl-foot-root lvl-foot-root--hockey">
+        <div class="lvl-foot-bg" aria-hidden="true"></div>
+        <div class="lvl-foot-header">
+          <button class="lvl-foot-header-back" id="lvl-foot-back">‹</button>
+          <div class="lvl-foot-header-center">
+            <span class="lvl-foot-header-icon">🏒</span>
+            <span class="lvl-foot-header-title">${cfg.name}</span>
+          </div>
+          <div class="lvl-foot-header-score">
+            <span class="lvl-foot-header-pts">${score}</span>
+            <span class="lvl-foot-header-max">/ ${cfg.maxScore}</span>
+          </div>
+        </div>
+        <div class="lvl-foot-starprog">
+          ${[...Array(36)].map((_, i) => `<span class="lvl-foot-starprog-dot ${i < totalStars ? 'on' : ''}"></span>`).join('')}
+        </div>
+        <div class="hock-map-meta">
+          <div class="hock-map-title">ЛЕДОВАЯ ДОРОЖКА</div>
+          <div class="hock-map-sub">Выбирай матч по шайбовой трассе</div>
+        </div>
+        <div class="hock-map-scroll">
+          <div class="hock-map-rink" style="height:${rinkHeight}px">
+            <svg class="hock-map-path" viewBox="0 0 100 ${rinkHeight}" preserveAspectRatio="none" aria-hidden="true">
+              <path d="${pathPoints}" fill="none" stroke="rgba(127,216,255,0.72)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="12 14"/>
+              <path d="${pathPoints}" fill="none" stroke="rgba(255,255,255,0.24)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <div class="hock-rink-lines" aria-hidden="true"></div>
+            ${nodes}
+          </div>
+        </div>
+
+        <div class="lvl-foot-bottom">
+          <button type="button" class="lvl-foot-ad" id="lvl-foot-ad">🎬 +❤️ Бонус</button>
+          <button type="button" class="lvl-foot-start" id="lvl-foot-start">▶ ИГРАТЬ</button>
+        </div>
+      </div>`);
+
+    const syncNodes = () => {
+      screen.querySelectorAll('.hock-node').forEach((btn) => {
+        const lv = parseInt(btn.dataset.level, 10);
+        const unlocked = btn.dataset.unlocked === '1';
+        btn.classList.toggle('hock-node--selected', unlocked && lv === selectedLevel);
+      });
+      const startBtn = screen.querySelector('#lvl-foot-start');
+      const canStart = Game.isLevelUnlocked(section, selectedLevel);
+      startBtn.disabled = !canStart;
+      startBtn.textContent = canStart ? `▶ УРОВЕНЬ ${selectedLevel}` : '🔒 ЗАБЛОКИРОВАНО';
+    };
+
+    screen.querySelectorAll('.hock-node').forEach((btn) => {
+      btn.onclick = () => {
+        if (btn.dataset.unlocked !== '1') return;
+        selectedLevel = parseInt(btn.dataset.level, 10);
+        syncNodes();
+      };
+    });
+
+    screen.querySelector('#lvl-foot-start').onclick = () => {
+      if (Game.isLevelUnlocked(section, selectedLevel)) this.showPreMatch(section, selectedLevel);
+    };
+    screen.querySelector('#lvl-foot-back').onclick = () => this.goBack();
+    screen.querySelector('#lvl-foot-ad').onclick = () => {
+      if (!SDK.canShowRewardedAd('level_map_ad')) {
+        this._hubToast(screen, T.menuHub.dailyDone);
+        return;
+      }
+      SDK.showRewardedAd(() => { SDK.markAdUsed('level_map_ad'); Game.grantMenuAdBonus(); this._hubToast(screen, T.levels.adBonusToast); }, () => {});
+    };
+
+    syncNodes();
   },
 
   _getSportPresentation(section) {
@@ -814,13 +937,13 @@ const UI = {
 
     const screen = this.showScreen(`
       <div class="pm3-root pm3-root--${section}">
-        <div class="pm3-hero" style="--ca:${teamA.color};--cb:${teamB.color}">
+        <div class="pm3-hero pm3-hero--${section}" style="--ca:${teamA.color};--cb:${teamB.color}">
           <div class="pm3-hero-inner">
             <button type="button" class="pm3-back-btn" id="pm3-back">←</button>
             <div class="pm3-level-tag">УР.${levelNum} · ${sport.label}</div>
             <div class="pm3-hero-teams">
               <div class="pm3-hero-team pm3-hero-team--a">
-                <div class="pm3-hero-emoji">${teamA.emoji}</div>
+                <div class="pm3-hero-emoji">${this._teamLogoHtml(section, teamA)}</div>
                 <div class="pm3-hero-name">${teamA.name}</div>
                 <div class="pm3-hero-rating">★ ${teamA.rating}</div>
               </div>
@@ -829,7 +952,7 @@ const UI = {
                 <div class="pm3-hero-vs-label">VS</div>
               </div>
               <div class="pm3-hero-team pm3-hero-team--b">
-                <div class="pm3-hero-emoji">${teamB.emoji}</div>
+                <div class="pm3-hero-emoji">${this._teamLogoHtml(section, teamB)}</div>
                 <div class="pm3-hero-name">${teamB.name}</div>
                 <div class="pm3-hero-rating">★ ${teamB.rating}</div>
               </div>
@@ -856,11 +979,11 @@ const UI = {
               <div class="pm3-section">
                 <div class="pm3-section-title">${sport.formTitle}</div>
                 <div class="pm3-form-row">
-                  <span class="pm3-form-emoji">${teamA.emoji}</span>
+                  <span class="pm3-form-emoji">${this._teamLogoHtml(section, teamA)}</span>
                   <div class="pm3-form-dots">${formDots(teamA.form)}</div>
                 </div>
                 <div class="pm3-form-row">
-                  <span class="pm3-form-emoji">${teamB.emoji}</span>
+                  <span class="pm3-form-emoji">${this._teamLogoHtml(section, teamB)}</span>
                   <div class="pm3-form-dots">${formDots(teamB.form)}</div>
                 </div>
               </div>
@@ -1076,7 +1199,7 @@ const UI = {
       <div class="lv-root lv-root--${section}">
         <div class="lv-topbar">
           <div class="lv-topbar-team">
-            <span class="lv-topbar-emoji">${teamA.emoji}</span>
+            <span class="lv-topbar-emoji">${this._teamLogoHtml(section, teamA)}</span>
             <span class="lv-topbar-name">${teamA.shortName}</span>
             <span class="lv-topbar-score" id="lv-score-a">0</span>
           </div>
@@ -1087,7 +1210,7 @@ const UI = {
           <div class="lv-topbar-team lv-topbar-team--right">
             <span class="lv-topbar-score" id="lv-score-b">0</span>
             <span class="lv-topbar-name">${teamB.shortName}</span>
-            <span class="lv-topbar-emoji">${teamB.emoji}</span>
+            <span class="lv-topbar-emoji">${this._teamLogoHtml(section, teamB)}</span>
           </div>
         </div>
 
@@ -1150,14 +1273,16 @@ const UI = {
     const B = teamB.color;
     const dots = section === 'hockey'
       ? [
-          { x: 7,  y: 50, c: A, gk: true },
-          { x: 24, y: 34, c: A }, { x: 24, y: 66, c: A },
-          { x: 42, y: 50, c: A },
-          { x: 58, y: 36, c: A, fwd: true }, { x: 58, y: 64, c: A, fwd: true },
-          { x: 93, y: 50, c: B, gk: true },
-          { x: 76, y: 34, c: B }, { x: 76, y: 66, c: B },
-          { x: 58, y: 50, c: B },
-          { x: 42, y: 36, c: B, fwd: true }, { x: 42, y: 64, c: B, fwd: true },
+          // Team A (left side)
+          { x: 6,  y: 50, c: A, gk: true },           // вратарь
+          { x: 23, y: 37, c: A }, { x: 23, y: 63, c: A }, // защитники
+          { x: 44, y: 50, c: A },                       // центр
+          { x: 60, y: 34, c: A, fwd: true }, { x: 60, y: 66, c: A, fwd: true }, // нападающие
+          // Team B (right side)
+          { x: 94, y: 50, c: B, gk: true },
+          { x: 77, y: 37, c: B }, { x: 77, y: 63, c: B },
+          { x: 56, y: 50, c: B },
+          { x: 40, y: 34, c: B, fwd: true }, { x: 40, y: 66, c: B, fwd: true },
         ]
       : [
           { x:4,  y:50, c:A, gk:true  },
@@ -1295,7 +1420,7 @@ const UI = {
           </div>
           <div class="lv-pstat-nums"><span>🛡${event.opp.stat}</span></div>
         </div>
-        <div class="lv-lives" id="lv-lives">${[1,2,3].map(i=>`<span class="lv-heart ${i>match.lives?'lv-heart--lost':''}">❤️</span>`).join('')}</div>`;
+        <div class="lv-lives" id="lv-lives">${[1,2,3].map(i=>`<span class="lv-heart ${i>match.lives?'lv-heart--lost':''}"><img src="assets/img/ui/heart_full.png" class="lv-heart-img" alt="❤"></span>`).join('')}</div>`;
       pbar.style.opacity = '1';
     }
 
@@ -1385,7 +1510,7 @@ const UI = {
     // Lives
     const livesEl = screen.querySelector('#lv-lives');
     if (livesEl) livesEl.innerHTML = [1,2,3].map(i =>
-      `<span class="lv-heart ${i > Game.match.lives ? 'lv-heart--lost' : ''}">❤️</span>`
+      `<span class="lv-heart ${i > Game.match.lives ? 'lv-heart--lost' : ''}"><img src="assets/img/ui/heart_full.png" class="lv-heart-img" alt="❤"></span>`
     ).join('');
 
     // Goal effects
@@ -1472,7 +1597,7 @@ const UI = {
     this._prevBallPos = { x: bx, y: by };
 
     const hearts = [1,2,3].map(i =>
-      `<span class="lv-heart ${i > match.lives ? 'lv-heart--lost' : ''}">❤️</span>`
+      `<span class="lv-heart ${i > match.lives ? 'lv-heart--lost' : ''}"><img src="assets/img/ui/heart_full.png" class="lv-heart-img" alt="❤"></span>`
     ).join('');
 
     // Build player dots HTML
@@ -1490,7 +1615,7 @@ const UI = {
         <!-- TOP BAR: TeamA score | time/live | score TeamB -->
         <div class="lv-topbar">
           <div class="lv-topbar-team">
-            <span class="lv-topbar-emoji">${match.teamA.emoji}</span>
+            <span class="lv-topbar-emoji">${this._teamLogoHtml(match.section, match.teamA)}</span>
             <span class="lv-topbar-name">${match.teamA.shortName}</span>
             <span class="lv-topbar-score" id="lv-score-a">${scoreA}</span>
           </div>
@@ -1501,7 +1626,7 @@ const UI = {
           <div class="lv-topbar-team lv-topbar-team--right">
             <span class="lv-topbar-score" id="lv-score-b">${scoreB}</span>
             <span class="lv-topbar-name">${match.teamB.shortName}</span>
-            <span class="lv-topbar-emoji">${match.teamB.emoji}</span>
+            <span class="lv-topbar-emoji">${this._teamLogoHtml(match.section, match.teamB)}</span>
           </div>
         </div>
 
@@ -1695,7 +1820,7 @@ const UI = {
     const livesEl = screen.querySelector('#lv-lives');
     if (livesEl) {
       livesEl.innerHTML = [1,2,3].map(i =>
-        `<span class="lv-heart ${i > Game.match.lives ? 'lv-heart--lost' : ''}">❤️</span>`
+        `<span class="lv-heart ${i > Game.match.lives ? 'lv-heart--lost' : ''}"><img src="assets/img/ui/heart_full.png" class="lv-heart-img" alt="❤"></span>`
       ).join('');
     }
 
@@ -1817,7 +1942,7 @@ const UI = {
 
     // Stars HTML — all start off, JS animates them in staggered
     const starsHtml = [1,2,3].map(n =>
-      `<span class="rs-star rs-star--off" id="rs-star${n}">★</span>`
+      `<span class="rs-star rs-star--off" id="rs-star${n}"><img src="assets/img/ui/star_gold.png" class="rs-star-img" alt="★"></span>`
     ).join('');
 
     // Phase 1 recap
@@ -1862,7 +1987,7 @@ const UI = {
         <div class="rs-hero" style="--ca:${teamA.color};--cb:${teamB.color}">
           <div class="rs-hero-teams">
             <div class="rs-hero-team">
-              <div class="rs-hero-emoji">${teamA.emoji}</div>
+              <div class="rs-hero-emoji">${this._teamLogoHtml(section, teamA)}</div>
               <div class="rs-hero-name">${teamA.shortName}</div>
             </div>
             <div class="rs-hero-score">
@@ -1870,7 +1995,7 @@ const UI = {
               <div class="rs-status ${won ? 'rs-status--win' : 'rs-status--lose'}">${won ? '✦ ПОБЕДА' : '✖ ПОРАЖЕНИЕ'}</div>
             </div>
             <div class="rs-hero-team rs-hero-team--b">
-              <div class="rs-hero-emoji">${teamB.emoji}</div>
+              <div class="rs-hero-emoji">${this._teamLogoHtml(section, teamB)}</div>
               <div class="rs-hero-name">${teamB.shortName}</div>
             </div>
           </div>

@@ -106,7 +106,7 @@ button:active { transform: scale(0.97); }
    LOADING SCREEN
    ============================================= */
 .screen-loading {
-  background: linear-gradient(160deg, #1a5c00 0%, #2d9e00 50%, #46A302 100%);
+  background: url('../assets/img/bg/bg_loading.png') center/cover no-repeat, linear-gradient(160deg, #0A0E1A 0%, #142236 100%);
   justify-content: center;
   align-items: center;
   gap: 20px;
@@ -200,13 +200,18 @@ button:active { transform: scale(0.97); }
 .heart-icon {
   font-size: 22px;
   transition: transform 0.15s;
+  display: inline-flex;
+  align-items: center;
 }
-
+.heart-icon .heart-img {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+}
 .heart-icon.lost {
   opacity: 0.25;
   filter: grayscale(1);
 }
-
 .heart-icon.shake {
   animation: heartShake 0.4s ease;
 }
@@ -237,12 +242,13 @@ button:active { transform: scale(0.97); }
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  background:
-    radial-gradient(ellipse 100% 70% at 50% -10%, rgba(255, 204, 0, 0.12), transparent 55%),
-    radial-gradient(ellipse 80% 50% at 80% 60%, rgba(30, 80, 140, 0.25), transparent 50%),
-    radial-gradient(ellipse 60% 40% at 15% 70%, rgba(40, 120, 60, 0.12), transparent 45%),
-    linear-gradient(180deg, #12152a 0%, #0a0b14 45%, #07080f 100%);
-  background-size: cover;
+  background: url('../assets/img/bg/bg_menu.png') center/cover no-repeat;
+}
+.menu-hub-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(7, 8, 20, 0.52);
 }
 
 .menu-hub-layout {
@@ -1186,25 +1192,21 @@ button:active { transform: scale(0.97); }
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  background:
-    radial-gradient(ellipse 120% 45% at 50% 15%, rgba(88,204,2,0.18) 0%, transparent 60%),
-    radial-gradient(ellipse 80% 30% at 50% 85%, rgba(24,80,40,0.22) 0%, transparent 55%),
-    linear-gradient(180deg, #080e0a 0%, #060d08 100%);
+  background: url('../assets/img/bg/bg_levelmap_football.png') center/cover no-repeat;
 }
-
-/* Subtle pitch center circle */
-.lvl-foot-bg::after {
+.lvl-foot-bg::before {
   content: '';
   position: absolute;
-  top: 30%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 180px;
-  height: 180px;
-  border-radius: 50%;
-  border: 1px solid rgba(88,204,2,0.08);
-  pointer-events: none;
+  inset: 0;
+  background: rgba(5, 10, 5, 0.55);
 }
+.lvl-foot-root--hockey .lvl-foot-bg {
+  background: url('../assets/img/bg/bg_levelmap_hockey.png') center/cover no-repeat;
+}
+.lvl-foot-root--hockey .lvl-foot-bg::before {
+  background: rgba(5, 10, 20, 0.50);
+}
+
 
 .lvl-foot-root > *:not(.lvl-foot-bg) {
   position: relative;
@@ -1269,6 +1271,9 @@ button:active { transform: scale(0.97); }
   font-weight: 900;
   color: #58CC02;
 }
+.lvl-foot-root--hockey .lvl-foot-header-pts {
+  color: #7fd8ff;
+}
 
 .lvl-foot-header-max {
   font-size: 11px;
@@ -1328,6 +1333,9 @@ button:active { transform: scale(0.97); }
 .lvl-foot-path {
   filter: drop-shadow(0 0 4px rgba(88,204,2,0.4));
 }
+.lvl-foot-root--hockey .lvl-foot-path {
+  filter: drop-shadow(0 0 6px rgba(127,216,255,0.5));
+}
 
 /* --- Tier labels --- */
 .lvl-tier-label {
@@ -1347,6 +1355,10 @@ button:active { transform: scale(0.97); }
 .lvl-tier--mid    { color: #1CB0F6; background: rgba(28,176,246,0.12); border: 1px solid rgba(28,176,246,0.25); }
 .lvl-tier--hard   { color: #FFC800; background: rgba(255,200,0,0.12); border: 1px solid rgba(255,200,0,0.25); }
 .lvl-tier--expert { color: #FF4B4B; background: rgba(255,75,75,0.12); border: 1px solid rgba(255,75,75,0.25); }
+.lvl-foot-root--hockey .lvl-tier--easy   { color: #b8f2ff; background: rgba(184,242,255,0.10); border-color: rgba(184,242,255,0.22); }
+.lvl-foot-root--hockey .lvl-tier--mid    { color: #7fd8ff; background: rgba(127,216,255,0.10); border-color: rgba(127,216,255,0.22); }
+.lvl-foot-root--hockey .lvl-tier--hard   { color: #4ec3ff; background: rgba(78,195,255,0.10); border-color: rgba(78,195,255,0.22); }
+.lvl-foot-root--hockey .lvl-tier--expert { color: #ffe38a; background: rgba(255,227,138,0.10); border-color: rgba(255,227,138,0.22); }
 
 /* --- Level nodes --- */
 .lvl-node {
@@ -1382,6 +1394,10 @@ button:active { transform: scale(0.97); }
 .lvl-node--mid    { box-shadow: 0 0 0 0 transparent, 0 4px 16px rgba(28,176,246,0.15); }
 .lvl-node--hard   { box-shadow: 0 0 0 0 transparent, 0 4px 16px rgba(255,200,0,0.15); }
 .lvl-node--expert { box-shadow: 0 0 0 0 transparent, 0 4px 16px rgba(255,75,75,0.15); }
+.lvl-foot-root--hockey .lvl-node--easy   { border-color: rgba(184,242,255,0.62); box-shadow: 0 4px 16px rgba(127,216,255,0.16); }
+.lvl-foot-root--hockey .lvl-node--mid    { border-color: rgba(127,216,255,0.72); box-shadow: 0 4px 16px rgba(127,216,255,0.18); }
+.lvl-foot-root--hockey .lvl-node--hard   { border-color: rgba(78,195,255,0.78); box-shadow: 0 4px 16px rgba(78,195,255,0.2); }
+.lvl-foot-root--hockey .lvl-node--expert { border-color: rgba(255,227,138,0.82); box-shadow: 0 4px 16px rgba(255,227,138,0.2); }
 
 .lvl-node:active:not(:disabled) {
   transform: translate(-50%, -50%) scale(0.93);
@@ -1494,6 +1510,167 @@ button:active { transform: scale(0.97); }
   letter-spacing: 0.1em;
   box-shadow: 0 4px 0 #2d7300, 0 8px 20px rgba(88,204,2,0.25);
   cursor: pointer;
+}
+.lvl-foot-root--hockey .lvl-foot-start {
+  background: linear-gradient(180deg, #d9f7ff 0%, #7fd8ff 45%, #278fd6 100%);
+  color: #04111c;
+  box-shadow: 0 4px 0 #18659c, 0 8px 20px rgba(127,216,255,0.28);
+}
+
+.hock-map-meta {
+  position: relative;
+  z-index: 1;
+  padding: 0 16px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.hock-map-title {
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(191, 236, 255, 0.75);
+}
+
+.hock-map-sub {
+  font-size: 12px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.45);
+}
+
+.hock-map-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 8px 12px 16px;
+}
+
+.hock-map-rink {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto;
+  border-radius: 28px;
+  border: 1px solid rgba(173, 221, 255, 0.22);
+  background:
+    radial-gradient(circle at 50% 50%, rgba(255,255,255,0.11), transparent 34%),
+    radial-gradient(circle at 50% 50%, rgba(126, 216, 255, 0.09), transparent 58%),
+    linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.03), 0 12px 30px rgba(0,0,0,0.22);
+  overflow: hidden;
+}
+.hock-map-path {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+  overflow: visible;
+}
+.hock-map-path path {
+  filter: drop-shadow(0 0 6px rgba(127,216,255,0.35));
+  vector-effect: non-scaling-stroke;
+}
+.hock-rink-lines {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+.hock-map-rink {
+  isolation: isolate;
+  overflow: visible;
+}
+.hock-node {
+  position: absolute;
+  width: 74px;
+  height: 74px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 3;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  text-decoration: none;
+  appearance: none;
+  border: 2px solid rgba(191,236,255,0.25);
+  padding: 0;
+  margin: 0;
+  outline: none;
+  font: inherit;
+  box-sizing: border-box;
+  background: rgba(255,255,255,0.08);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+}
+.hock-node--open { border-color: rgba(127,216,255,0.66); box-shadow: 0 0 0 1px rgba(127,216,255,0.18), 0 6px 18px rgba(127,216,255,0.16); }
+.hock-node--perfect { background: linear-gradient(145deg, #eafcff, #89dfff); color: #0b2030; }
+.hock-node--locked { opacity: 0.45; border-style: dashed; }
+.hock-node--selected { box-shadow: 0 0 0 4px rgba(127,216,255,0.25), 0 0 20px rgba(127,216,255,0.34), 0 6px 18px rgba(0,0,0,0.25); animation: hockNodePulse 1.7s ease-in-out infinite; }
+.hock-node:disabled { cursor: not-allowed; }
+.hock-node:not(:disabled) { cursor: pointer; }
+.hock-node:not(:disabled):active { transform: translate(-50%, -50%) scale(0.96); }
+
+@keyframes hockNodePulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -50%) scale(1.05); }
+}
+
+.hock-node-inner {
+  font-size: 24px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.hock-node-stars {
+  display: flex;
+  gap: 1px;
+  font-size: 10px;
+  pointer-events: none;
+}
+
+.hock-node-star.on { color: #ffe38a; }
+.hock-node-star.off { color: rgba(255,255,255,0.18); }
+
+.hock-rink-lines,
+.hock-map-path,
+.hock-map-rink::before,
+.hock-map-rink::after {
+  pointer-events: none;
+}
+
+.hock-map-scroll {
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.hock-map-rink,
+.hock-map-scroll {
+  scrollbar-width: none;
+}
+
+.hock-map-rink::-webkit-scrollbar,
+.hock-map-scroll::-webkit-scrollbar { display: none; }
+
+.hock-node--selected {
+  z-index: 4;
+}
+
+.hock-node:not(:disabled):hover {
+  transform: translate(-50%, -50%) scale(1.02);
+}
+
+.hock-node:not(:disabled):active {
+  transform: translate(-50%, -50%) scale(0.96);
 }
 
 .lvl-foot-start:disabled {
@@ -2411,6 +2588,20 @@ button:active { transform: scale(0.97); }
   background: linear-gradient(135deg, color-mix(in srgb, var(--ca) 40%, #0a0a0f) 0%, #0a0a0f 50%, color-mix(in srgb, var(--cb) 40%, #0a0a0f) 100%);
   border-bottom: 1px solid rgba(255,255,255,0.07);
 }
+.pm3-hero--football::before,
+.pm3-hero--hockey::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  opacity: 0.22;
+  z-index: 0;
+}
+.pm3-hero--football::before { background-image: url('../assets/img/bg/bg_prematch_football.png'); }
+.pm3-hero--hockey::before  { background-image: url('../assets/img/bg/bg_prematch_hockey.png'); }
+.pm3-hero--football > *,
+.pm3-hero--hockey > * { position: relative; z-index: 1; }
 .pm3-back-btn {
   position: absolute;
   top: 12px;
@@ -2452,6 +2643,16 @@ button:active { transform: scale(0.97); }
 }
 .pm3-hero-team--b { text-align: center; }
 .pm3-hero-emoji {
+  font-size: 36px;
+  line-height: 1;
+}
+.pm3-hero-emoji .team-logo-img {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 18px rgba(0,0,0,0.55));
+}
+.pm3-hero-emoji .team-logo-fb {
   font-size: 36px;
   line-height: 1;
 }
@@ -2620,7 +2821,15 @@ button:active { transform: scale(0.97); }
   gap: 8px;
   margin-bottom: 6px;
 }
-.pm3-form-emoji { font-size: 16px; flex-shrink: 0; }
+.pm3-form-emoji { font-size: 16px; flex-shrink: 0; line-height: 1; }
+.pm3-form-emoji .team-logo-img {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  vertical-align: middle;
+  border-radius: 3px;
+}
+.pm3-form-emoji .team-logo-fb { font-size: 16px; }
 .pm3-form-dots { display: flex; gap: 4px; }
 .pm3-dot {
   width: 26px;
@@ -4268,7 +4477,14 @@ button:active { transform: scale(0.97); }
   flex: 1;
 }
 .lv-topbar-team--right { justify-content: flex-end; }
-.lv-topbar-emoji { font-size: 18px; line-height: 1; }
+.lv-topbar-emoji { font-size: 18px; line-height: 1; display: flex; align-items: center; }
+.lv-topbar-emoji .team-logo-img {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.5));
+}
+.lv-topbar-emoji .team-logo-fb { font-size: 18px; }
 .lv-topbar-name  { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.5); }
 .lv-topbar-score {
   font-size: 22px;
@@ -4338,13 +4554,10 @@ button:active { transform: scale(0.97); }
   overflow: hidden;
 }
 
-/* Hockey ice rink - replaces green field */
+/* Hockey ice rink */
 .lv-field-wrap--hockey .lv-field,
 .lv-field--hockey {
-  background:
-    radial-gradient(circle at center, rgba(255,255,255,0.16), transparent 54%),
-    linear-gradient(180deg, rgba(140,180,220,0.15), rgba(60,90,120,0.05)),
-    linear-gradient(180deg, #d8edf8 0%, #c8e2f3 45%, #e7f5fb 100%);
+  background: url('../assets/img/field/hockey_rink.png') center/cover no-repeat, #c8e2f3;
 }
 
 .lv-field-svg {
@@ -4352,6 +4565,11 @@ button:active { transform: scale(0.97); }
   inset: 0;
   width: 100%;
   height: 100%;
+}
+
+/* Hockey PNG already has rink markings — hide SVG overlay */
+.lv-field-svg--hockey {
+  display: none;
 }
 
 /* Hockey SVG: darker lines to contrast against light ice */
@@ -4469,6 +4687,17 @@ button:active { transform: scale(0.97); }
   padding: 7px 10px 4px;
   text-align: center;
   letter-spacing: 0.2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+.ev-icon-img {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  vertical-align: middle;
+  flex-shrink: 0;
 }
 .lv-field-card-row {
   display: flex;
@@ -4505,6 +4734,28 @@ button:active { transform: scale(0.97); }
   width: 100%;
   background: #FFC800;
   transition: width 1s linear, background 0.3s;
+}
+.lv-field-wrap--hockey .lv-timer-track {
+  height: 10px;
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.55) 0%, rgba(165,221,255,0.42) 48%, rgba(108,177,230,0.55) 100%),
+    linear-gradient(90deg, rgba(255,255,255,0.22), rgba(153,212,255,0.38), rgba(255,255,255,0.22));
+  border: 1px solid rgba(128,195,238,0.55);
+  box-shadow:
+    inset 0 1px 2px rgba(255,255,255,0.65),
+    inset 0 -1px 3px rgba(22,78,120,0.18),
+    0 0 0 1px rgba(56,146,214,0.15),
+    0 0 12px rgba(84,181,255,0.18);
+  overflow: hidden;
+}
+.lv-field-wrap--hockey .lv-timer-fill {
+  background:
+    linear-gradient(90deg, #f5fdff 0%, #c6f0ff 18%, #7cd3ff 40%, #47b0ff 68%, #9fe0ff 100%);
+  box-shadow:
+    0 0 10px rgba(84,181,255,0.48),
+    inset 0 1px 0 rgba(255,255,255,0.55);
+  border-radius: inherit;
 }
 
 /* --- Player stats bar --- */
@@ -4567,7 +4818,8 @@ button:active { transform: scale(0.97); }
   line-height: 1.3;
 }
 .lv-lives { display: flex; gap: 3px; flex-shrink: 0; }
-.lv-heart { font-size: 14px; }
+.lv-heart { font-size: 14px; display: inline-flex; align-items: center; }
+.lv-heart .lv-heart-img { width: 16px; height: 16px; object-fit: contain; }
 .lv-heart--lost { opacity: 0.2; filter: grayscale(1); }
 
 /* --- Answer buttons --- */
@@ -4698,6 +4950,13 @@ button:active { transform: scale(0.97); }
   line-height: 1;
   filter: drop-shadow(0 4px 12px rgba(0,0,0,0.5));
 }
+.rs-hero-emoji .team-logo-img {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 16px rgba(0,0,0,0.55));
+}
+.rs-hero-emoji .team-logo-fb { font-size: 44px; line-height: 1; }
 
 .rs-hero-name {
   font-size: 11px;
@@ -4767,15 +5026,19 @@ button:active { transform: scale(0.97); }
 }
 
 .rs-star {
-  font-size: 32px;
+  display: inline-block;
   filter: drop-shadow(0 2px 6px rgba(0,0,0,0.4));
   transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
-
+.rs-star-img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  display: block;
+}
 .rs-star--off {
   filter: grayscale(1) brightness(0.35);
 }
-
 .rs-star--on {
   animation: rsStarPop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
@@ -5093,6 +5356,10 @@ button:active { transform: scale(0.97); }
   .pm3-hero-emoji {
     font-size: 64px;
   }
+  .pm3-hero-emoji .team-logo-img {
+    width: 96px;
+    height: 96px;
+  }
 
   .pm3-hero-name {
     font-size: 22px;
@@ -5186,6 +5453,10 @@ button:active { transform: scale(0.97); }
 
   .pm3-form-emoji {
     font-size: 28px;
+  }
+  .pm3-form-emoji .team-logo-img {
+    width: 32px;
+    height: 32px;
   }
 
   .pm3-form-dots {
@@ -5327,6 +5598,10 @@ button:active { transform: scale(0.97); }
 
   .lv-topbar-emoji {
     font-size: 28px;
+  }
+  .lv-topbar-emoji .team-logo-img {
+    width: 36px;
+    height: 36px;
   }
 
   .lv-topbar-name {
