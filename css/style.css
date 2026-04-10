@@ -6201,3 +6201,27 @@ button:active { transform: scale(0.97); }
   height: 14px;
   border-width: 2px;
 }
+
+/* Hide ball for esports (no ball in CS2) */
+.lv-ball--esports {
+  display: none;
+}
+
+/* CS2 simulation player dots */
+.cs2p {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.8);
+  transform: translate(-50%, -50%);
+  z-index: 8;
+  transition: opacity 0.4s;
+  box-shadow: 0 0 6px rgba(0,0,0,0.5);
+}
+.cs2p--t {
+  box-shadow: 0 0 6px rgba(255,180,50,0.5), 0 0 12px rgba(255,180,50,0.2);
+}
+.cs2p--ct {
+  box-shadow: 0 0 6px rgba(80,160,255,0.5), 0 0 12px rgba(80,160,255,0.2);
+}

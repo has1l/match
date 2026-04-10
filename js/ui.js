@@ -1410,15 +1410,26 @@ const UI = {
     screen.querySelector('#lv-btn-yes').onclick = () => this._handleLiveAnswer('yes');
     screen.querySelector('#lv-btn-no').onclick  = () => this._handleLiveAnswer('no');
 
+    // CS2: init simulation engine with player movement
+    if (match.section === 'esports') {
+      const fieldEl = screen.querySelector('#lv-field');
+      if (fieldEl && typeof CS2Sim !== 'undefined') {
+        CS2Sim.init(fieldEl, teamA, teamB);
+        CS2Sim.start();
+      }
+    }
+
     // Kickoff: ball at center, then start idle + first event
     setTimeout(() => {
-      this._lvStartIdle();
+      if (match.section !== 'esports') this._lvStartIdle();
       setTimeout(() => this._lvTriggerEvent(), 2200);
     }, 300);
   },
 
   _lvIdlePlayers(teamA, teamB) {
     const section = Game.match && Game.match.section;
+    // CS2: players are handled by CS2Sim engine
+    if (section === 'esports') return '';
     const A = teamA.color;
     const B = teamB.color;
     const dots = section === 'hockey'
@@ -1500,6 +1511,11 @@ const UI = {
     if (timeEl) timeEl.textContent = event.minute + "'";
 
     // Show event players, dim idle players
+    const isEsports = match.section === 'esports';
+    if (isEsports && typeof CS2Sim !== 'undefined') {
+      CS2Sim.pause();
+      CS2Sim.dimAll();
+    }
     const idleP = screen.querySelector('#lv-idle-players');
     if (idleP) idleP.style.opacity = '0.25';
     const evP = screen.querySelector('#lv-event-players');
@@ -1559,7 +1575,9 @@ const UI = {
             <div class="lv-pstat-name">${event.player.name}</div>
             <div class="lv-pstat-role">${event.player.pos}</div>
           </div>
-          <div class="lv-pstat-nums"><span>⚡${event.player.shot}</span><span>🏃${event.player.speed}</span></div>
+          <div class="lv-pstat-nums">${match.section === 'esports'
+            ? `<span>⭐${event.player.rating}</span><span>💥${event.player.adr}</span>`
+            : `<span>⚡${event.player.shot}</span><span>🏃${event.player.speed}</span>`}</div>
         </div>
         <div class="lv-pstat-vs">VS</div>
         <div class="lv-pstat">
@@ -1709,15 +1727,23 @@ const UI = {
       if (evP)   evP.innerHTML = '';
       if (idleP) idleP.style.opacity = '1';
 
+      // CS2: restore and resume simulation, new round routes
+      const isCs2 = Game.match && Game.match.section === 'esports';
+      if (isCs2 && typeof CS2Sim !== 'undefined') {
+        CS2Sim.restoreAll();
+        CS2Sim.newRound(Game.match.teamA.color, Game.match.teamB.color);
+        CS2Sim.resume();
+      }
+
       if (Game.match.phase2Done) { this._finishLevel(); return; }
 
       // Resume — if goal ball goes center, if miss ball goes to defending GK
       st.phase   = 'idle';
       st.blocked = false;
-      this._lvMove(isGoal ? 50 : 6, 50, 0.9);
+      if (!isCs2) this._lvMove(isGoal ? 50 : 6, 50, 0.9);
 
       setTimeout(() => {
-        this._lvStartIdle();
+        if (!isCs2) this._lvStartIdle();
         setTimeout(() => this._lvTriggerEvent(), 1800);
       }, 1000);
     }, delay);
@@ -2008,6 +2034,7 @@ const UI = {
   // GAME OVER (no lives)
   // =============================================
   _showGameOver(currentScreen) {
+    if (typeof CS2Sim !== 'undefined') CS2Sim.destroy();
     const canWatch = !Game.match.adUsed && SDK.canShowRewardedAd('life');
 
     const overlay = document.createElement('div');
@@ -2063,6 +2090,7 @@ const UI = {
   // FINISH LEVEL & RESULT SCREEN
   // =============================================
   _finishLevel() {
+    if (typeof CS2Sim !== 'undefined') CS2Sim.destroy();
     Game.stopTimer();
     const result = Game.finishMatch();
     if (!result) return;
