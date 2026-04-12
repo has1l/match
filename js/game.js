@@ -128,8 +128,9 @@ const Game = {
     const lvl = getLevelData(section, levelNum);
     if (!lvl) return;
 
+    const totalThreshold = lvl.totalThreshold || (section === 'football' ? 2.5 : section === 'hockey' ? 5.5 : 26.5);
     const matchResult = Events.generateMatchResult(section, lvl.teamA, lvl.teamB);
-    const goalTotal   = Events.generateGoalTotal(section, lvl.teamA, lvl.teamB);
+    const goalTotal   = Events.generateGoalTotal(section, lvl.teamA, lvl.teamB, totalThreshold);
     const liveEvents  = Events.generate(section, lvl.teamA, lvl.teamB, lvl.events);
 
     this.match = {
@@ -142,6 +143,7 @@ const Game = {
       // Pre-determined outcomes (hidden from player)
       matchResult,    // 'A' | 'draw' | 'B'
       goalTotal,      // 'high' | 'low'
+      totalThreshold, // e.g. 1.5, 2.5, 3.5
       liveEvents,
 
       // Scoring
@@ -257,7 +259,8 @@ const Game = {
     match.won = won;
 
     if (won) {
-      const stars = match.score >= 10 ? 3 : match.score >= 8 ? 2 : 1;
+      const maxScore = 2 + match.liveEvents.length;
+      const stars = match.score >= maxScore ? 3 : match.score >= Math.ceil(maxScore * 0.75) ? 2 : 1;
       const rec   = this.getLevelRecord(match.section, match.levelNum);
       const prevBest = rec ? rec.best : 0;
       const isNewBest = match.score > prevBest;
@@ -281,7 +284,7 @@ const Game = {
       // Stats
       this.data.stats.gamesPlayed++;
       this.data.stats.gamesWon = (this.data.stats.gamesWon || 0) + 1;
-      if (match.score === 10) this.data.stats.perfectGames++;
+      if (stars === 3) this.data.stats.perfectGames++;
 
       this._checkAchievements();
       this.saveData();

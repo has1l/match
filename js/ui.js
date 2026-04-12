@@ -968,10 +968,10 @@ const UI = {
           { id: 'B', label: teamB.shortName },
         ]),
         q2Title: '🥅 ТОТАЛ ШАЙБ',
-        q2Options: [
-          { id: 'low', label: 'Меньше 5.5' },
-          { id: 'high', label: 'Больше 5.5' },
-        ],
+        q2Options: (() => { const t = (Game.match && Game.match.totalThreshold) || 5.5; return [
+          { id: 'low', label: `Меньше ${t}` },
+          { id: 'high', label: `Больше ${t}` },
+        ]; })(),
         hint: 'Сделай оба прогноза чтобы начать',
         playerStats: (p) => [`🥅${p.shot}`, `💨${p.speed}`],
         resultWinnerLabel: 'Победитель',
@@ -1000,10 +1000,10 @@ const UI = {
         { id: 'B',    label: teamB.shortName },
       ]),
       q2Title: '⚽ ТОТАЛ ГОЛОВ',
-      q2Options: [
-        { id: 'low', label: 'Меньше 2.5' },
-        { id: 'high', label: 'Больше 2.5' },
-      ],
+      q2Options: (() => { const t = (Game.match && Game.match.totalThreshold) || 2.5; return [
+        { id: 'low', label: `Меньше ${t}` },
+        { id: 'high', label: `Больше ${t}` },
+      ]; })(),
       hint: 'Сделай оба прогноза чтобы начать',
       playerStats: (p) => [`⚡${p.shot}`, `🏃${p.speed}`],
       resultWinnerLabel: 'Победитель',
@@ -1020,9 +1020,10 @@ const UI = {
   },
 
   _fmtResultP1Q2(id) {
+    const t = (Game.match && Game.match.totalThreshold) || 2.5;
     return id === 'high'
-      ? `${T.phase1.q2.sqHigh} ${T.phase1.q2.sqHighSub}`
-      : `${T.phase1.q2.sqLow} ${T.phase1.q2.sqLowSub}`;
+      ? `${T.phase1.q2.sqHigh} ≥ ${t}`
+      : `${T.phase1.q2.sqLow} < ${t}`;
   },
 
   // =============================================
@@ -1903,7 +1904,11 @@ const UI = {
         </div>
         <div class="lv-pstat-vs">VS</div>
         <div class="lv-pstat">
-          <div class="lv-pstat-av lv-pstat-av--def">${event.opp.name.split(' ').pop()[0]}</div>
+          <div class="lv-pstat-av lv-pstat-av--def">
+            ${event.opp.id && match.section === 'football'
+              ? `<img src="assets/img/players/football/${event.opp.id}.jpg" class="lv-pstat-photo" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><span style="display:none">${event.opp.name.split(' ').pop()[0]}</span>`
+              : event.opp.name.split(' ').pop()[0]}
+          </div>
           <div class="lv-pstat-info">
             <div class="lv-pstat-name">${event.opp.name}</div>
             <div class="lv-pstat-role">${event.opp.pos}</div>
@@ -2184,7 +2189,11 @@ const UI = {
         <!-- PLAYER STATS -->
         <div class="lv-players-bar" id="lv-qbar" style="opacity:0;">
           <div class="lv-pstat lv-pstat--att" style="border-color:${event.attacker.color}">
-            <div class="lv-pstat-av" style="background:${event.attacker.color}">${event.player.name.split(' ').pop().slice(0,1)}</div>
+            <div class="lv-pstat-av" style="background:${event.attacker.color}">
+              ${event.player.id && match.section === 'football'
+                ? `<img src="assets/img/players/football/${event.player.id}.jpg" class="lv-pstat-photo" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><span style="display:none">${event.player.name.split(' ').pop()[0]}</span>`
+                : event.player.name.split(' ').pop().slice(0,1)}
+            </div>
             <div class="lv-pstat-info">
               <div class="lv-pstat-name">${event.player.name}</div>
               <div class="lv-pstat-role">${event.player.pos}</div>
@@ -2196,7 +2205,11 @@ const UI = {
           </div>
           <div class="lv-pstat-vs">VS</div>
           <div class="lv-pstat lv-pstat--def">
-            <div class="lv-pstat-av lv-pstat-av--def">${event.opp.name.split(' ').pop().slice(0,1)}</div>
+            <div class="lv-pstat-av lv-pstat-av--def">
+              ${event.opp.id && match.section === 'football'
+                ? `<img src="assets/img/players/football/${event.opp.id}.jpg" class="lv-pstat-photo" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><span style="display:none">${event.opp.name.split(' ').pop()[0]}</span>`
+                : event.opp.name.split(' ').pop().slice(0,1)}
+            </div>
             <div class="lv-pstat-info">
               <div class="lv-pstat-name">${event.opp.name}</div>
               <div class="lv-pstat-role">${event.opp.pos}</div>
@@ -2375,8 +2388,7 @@ const UI = {
   // GAME OVER (no lives)
   // =============================================
   _showGameOver(currentScreen) {
-    if (typeof CS2Sim      !== 'undefined') CS2Sim.destroy();
-    if (typeof FootballSim !== 'undefined') FootballSim.destroy();
+    // Sims are already paused at this point — don't destroy them yet
     const canWatch = !Game.match.adUsed && SDK.canShowRewardedAd('life');
 
     const overlay = document.createElement('div');
@@ -2395,14 +2407,21 @@ const UI = {
     if (target) target.appendChild(overlay);
 
     Game.stopTimer();
-    Game.finishMatch(); // record the loss
+    // Don't call finishMatch here if ad is available — defer until user actually leaves
+    if (!canWatch) Game.finishMatch();
 
     overlay.querySelector('#go-retry') && (overlay.querySelector('#go-retry').onclick = () => {
+      if (typeof CS2Sim      !== 'undefined') CS2Sim.destroy();
+      if (typeof FootballSim !== 'undefined') FootballSim.destroy();
+      if (canWatch) Game.finishMatch();
       const { section, levelNum } = Game.match;
       this._clearAndShow(() => this.showPreMatch(section, levelNum));
     });
 
     overlay.querySelector('#go-map') && (overlay.querySelector('#go-map').onclick = () => {
+      if (typeof CS2Sim      !== 'undefined') CS2Sim.destroy();
+      if (typeof FootballSim !== 'undefined') FootballSim.destroy();
+      if (canWatch) Game.finishMatch();
       const section = Game.match.section;
       this._clearAndShow(() => this.showLevelMap(section));
     });
@@ -2414,10 +2433,53 @@ const UI = {
         watchBtn.textContent = '⏳ Загрузка...';
         SDK.showRewardedAd(
           () => {
-            // Rewarded: give +1 life
             Game.addLife();
             overlay.remove();
-            this.showPhase2Event();
+
+            // Continue on the existing live match screen
+            const screen = this._lsScreen;
+            if (!screen) { this.showPhase2Event(); return; }
+
+            // Update lives display
+            const livesEl = screen.querySelector('#lv-lives');
+            if (livesEl) livesEl.innerHTML = [1,2,3].map(i =>
+              `<span class="lv-heart ${i > Game.match.lives ? 'lv-heart--lost' : ''}"><img src="assets/img/ui/heart_full.png" class="lv-heart-img" alt="❤"></span>`
+            ).join('');
+
+            // Clean up event UI (left over from the failed answer)
+            const card = screen.querySelector('#lv-event-card');
+            if (card) { card.style.opacity = '0'; card.style.pointerEvents = 'none'; }
+            const pbar = screen.querySelector('#lv-pbar');
+            if (pbar) pbar.style.opacity = '0';
+            const qbar = screen.querySelector('#lv-qbar');
+            if (qbar) qbar.style.opacity = '0';
+            const answers = screen.querySelector('#lv-answers');
+            if (answers) { answers.style.opacity = '0'; answers.style.pointerEvents = 'none'; }
+            const fbEl = screen.querySelector('#lv-feedback');
+            if (fbEl) fbEl.textContent = '';
+            const evP = screen.querySelector('#lv-event-players');
+            if (evP) evP.innerHTML = '';
+            const idleP = screen.querySelector('#lv-idle-players');
+            if (idleP) idleP.style.opacity = '1';
+
+            // Reset match state so _lvTriggerEvent can run
+            this._lsState = { phase: 'idle', idleTimer: null, idleIdx: 0, blocked: false };
+
+            const section = Game.match.section;
+            if (section === 'esports' && typeof CS2Sim !== 'undefined') {
+              CS2Sim.restoreAll();
+              CS2Sim.newRound(Game.match.teamA.color, Game.match.teamB.color);
+              CS2Sim.resume();
+            } else if (section === 'football' && typeof FootballSim !== 'undefined') {
+              FootballSim.restoreAll();
+              FootballSim.newRound(false, false);
+            } else {
+              this._lvGetDots().forEach(d => this._lvResetDot(d, 0.6));
+              this._lvMove(50, 50, 0.7);
+              this._lvStartIdle();
+            }
+
+            setTimeout(() => this._lvTriggerEvent(), 1800);
           },
           () => {
             watchBtn.disabled = false;
@@ -2463,7 +2525,7 @@ const UI = {
 
     // Stars HTML — all start off, JS animates them in staggered
     const starsHtml = [1,2,3].map(n =>
-      `<span class="rs-star rs-star--off" id="rs-star${n}"><img src="assets/img/ui/star_gold.png" class="rs-star-img" alt="★"></span>`
+      `<span class="rs-star rs-star--off" id="rs-star${n}">★</span>`
     ).join('');
 
     // Phase 1 recap

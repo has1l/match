@@ -640,18 +640,18 @@ const HOCKEY_TEAMS = [
 // HOCKEY LEVELS (12 levels)
 // =============================================
 const HOCKEY_LEVELS = [
-  { num: 1,  teamA: 'northern_storm', teamB: 'ice_guard',      events: 5, winThreshold: 4 },
-  { num: 2,  teamA: 'ice_dragons',    teamB: 'storm_ravens',   events: 5, winThreshold: 4 },
-  { num: 3,  teamA: 'steel_blades',   teamB: 'white_comets',   events: 5, winThreshold: 4 },
-  { num: 4,  teamA: 'polar_sharks',   teamB: 'aurora_wings',   events: 6, winThreshold: 6 },
-  { num: 5,  teamA: 'arctic_bears',   teamB: 'frost_foxes',    events: 6, winThreshold: 6 },
-  { num: 6,  teamA: 'snow_owls',      teamB: 'glacier_wolves', events: 6, winThreshold: 6 },
-  { num: 7,  teamA: 'northern_storm', teamB: 'snow_owls',      events: 7, winThreshold: 6 },
-  { num: 8,  teamA: 'ice_dragons',    teamB: 'arctic_bears',   events: 7, winThreshold: 6 },
-  { num: 9,  teamA: 'steel_blades',   teamB: 'polar_sharks',   events: 7, winThreshold: 6 },
-  { num: 10, teamA: 'northern_storm', teamB: 'steel_blades',   events: 8, winThreshold: 8 },
-  { num: 11, teamA: 'ice_dragons',    teamB: 'polar_sharks',   events: 8, winThreshold: 8 },
-  { num: 12, teamA: 'arctic_bears',   teamB: 'snow_owls',      events: 8, winThreshold: 8 },
+  { num: 1,  teamA: 'northern_storm', teamB: 'ice_guard',      events: 5, winThreshold: 4, totalThreshold: 3.5 },
+  { num: 2,  teamA: 'ice_dragons',    teamB: 'storm_ravens',   events: 5, winThreshold: 4, totalThreshold: 3.5 },
+  { num: 3,  teamA: 'steel_blades',   teamB: 'white_comets',   events: 5, winThreshold: 4, totalThreshold: 3.5 },
+  { num: 4,  teamA: 'polar_sharks',   teamB: 'aurora_wings',   events: 6, winThreshold: 6, totalThreshold: 4.5 },
+  { num: 5,  teamA: 'arctic_bears',   teamB: 'frost_foxes',    events: 6, winThreshold: 6, totalThreshold: 4.5 },
+  { num: 6,  teamA: 'snow_owls',      teamB: 'glacier_wolves', events: 6, winThreshold: 6, totalThreshold: 4.5 },
+  { num: 7,  teamA: 'northern_storm', teamB: 'snow_owls',      events: 7, winThreshold: 6, totalThreshold: 5.5 },
+  { num: 8,  teamA: 'ice_dragons',    teamB: 'arctic_bears',   events: 7, winThreshold: 6, totalThreshold: 5.5 },
+  { num: 9,  teamA: 'steel_blades',   teamB: 'polar_sharks',   events: 7, winThreshold: 6, totalThreshold: 5.5 },
+  { num: 10, teamA: 'northern_storm', teamB: 'steel_blades',   events: 8, winThreshold: 8, totalThreshold: 6.5 },
+  { num: 11, teamA: 'ice_dragons',    teamB: 'polar_sharks',   events: 8, winThreshold: 8, totalThreshold: 6.5 },
+  { num: 12, teamA: 'arctic_bears',   teamB: 'snow_owls',      events: 8, winThreshold: 8, totalThreshold: 6.5 },
 ];
 
 // =============================================
@@ -910,21 +910,21 @@ const CS2_LEVELS = [
 // =============================================
 const FOOTBALL_LEVELS = [
   // --- EASY (большая разница в силе) ---
-  { num: 1,  teamA: 'real_madrid',  teamB: 'marseille',   events: 5, winThreshold: 4 },
-  { num: 2,  teamA: 'man_city',     teamB: 'ajax',        events: 5, winThreshold: 4 },
-  { num: 3,  teamA: 'bayern',       teamB: 'tottenham',   events: 5, winThreshold: 4 },
+  { num: 1,  teamA: 'real_madrid',  teamB: 'marseille',   events: 5, winThreshold: 4, totalThreshold: 1.5 },
+  { num: 2,  teamA: 'man_city',     teamB: 'ajax',        events: 5, winThreshold: 4, totalThreshold: 1.5 },
+  { num: 3,  teamA: 'bayern',       teamB: 'tottenham',   events: 5, winThreshold: 4, totalThreshold: 1.5 },
   // --- MEDIUM (средняя разница) ---
-  { num: 4,  teamA: 'barcelona',    teamB: 'napoli',      events: 6, winThreshold: 6 },
-  { num: 5,  teamA: 'liverpool',    teamB: 'ac_milan',    events: 6, winThreshold: 6 },
-  { num: 6,  teamA: 'psg',          teamB: 'porto',       events: 6, winThreshold: 6 },
+  { num: 4,  teamA: 'barcelona',    teamB: 'napoli',      events: 6, winThreshold: 6, totalThreshold: 2.5 },
+  { num: 5,  teamA: 'liverpool',    teamB: 'ac_milan',    events: 6, winThreshold: 6, totalThreshold: 2.5 },
+  { num: 6,  teamA: 'psg',          teamB: 'porto',       events: 6, winThreshold: 6, totalThreshold: 2.5 },
   // --- HARD (близкие по силе) ---
-  { num: 7,  teamA: 'real_madrid',  teamB: 'bayern',      events: 7, winThreshold: 6 },
-  { num: 8,  teamA: 'arsenal',      teamB: 'juventus',    events: 7, winThreshold: 6 },
-  { num: 9,  teamA: 'atletico',     teamB: 'inter',       events: 7, winThreshold: 6 },
+  { num: 7,  teamA: 'real_madrid',  teamB: 'bayern',      events: 7, winThreshold: 6, totalThreshold: 2.5 },
+  { num: 8,  teamA: 'arsenal',      teamB: 'juventus',    events: 7, winThreshold: 6, totalThreshold: 2.5 },
+  { num: 9,  teamA: 'atletico',     teamB: 'inter',       events: 7, winThreshold: 6, totalThreshold: 2.5 },
   // --- EXPERT (топ-дерби) ---
-  { num: 10, teamA: 'real_madrid',  teamB: 'barcelona',   events: 8, winThreshold: 8 },
-  { num: 11, teamA: 'man_city',     teamB: 'liverpool',   events: 8, winThreshold: 8 },
-  { num: 12, teamA: 'bayern',       teamB: 'dortmund',    events: 8, winThreshold: 8 },
+  { num: 10, teamA: 'real_madrid',  teamB: 'barcelona',   events: 8, winThreshold: 8, totalThreshold: 3.5 },
+  { num: 11, teamA: 'man_city',     teamB: 'liverpool',   events: 8, winThreshold: 8, totalThreshold: 3.5 },
+  { num: 12, teamA: 'bayern',       teamB: 'dortmund',    events: 8, winThreshold: 8, totalThreshold: 3.5 },
 ];
 
 // =============================================

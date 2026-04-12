@@ -97,11 +97,11 @@ const Events = {
         const isGKEvent = ['penalty', 'one_on_one', 'free_kick', 'long_shot', 'corner', 'header'].includes(type);
         if (isGKEvent) {
           const gk = defTeam.players.find(p => p.posCode === 'GK') || defTeam.players[0];
-          return { name: gk.name, pos: gk.pos, stat: Math.round(Events.clamp(defTeam.defense + Events.rand(-6, 6), 40, 99)), statName: 'защита' };
+          return { id: gk.id, name: gk.name, pos: gk.pos, stat: Math.round(Events.clamp(defTeam.defense + Events.rand(-6, 6), 40, 99)), statName: 'защита' };
         }
         const defPool = defTeam.players.filter(p => ['CB','RB','LB','DM'].includes(p.posCode));
         const def = defPool.length ? Events.pick(defPool) : defTeam.players[2];
-        return { name: def.name, pos: def.pos, stat: Math.round(Events.clamp(defTeam.defense + Events.rand(-6, 6), 40, 99)), statName: 'защита' };
+        return { id: def.id, name: def.name, pos: def.pos, stat: Math.round(Events.clamp(defTeam.defense + Events.rand(-6, 6), 40, 99)), statName: 'защита' };
       },
       getPlayerStat(player, type) {
         if (type === 'counterattack') return { name: 'скорость', val: player.speed };
@@ -208,9 +208,11 @@ const Events = {
         if (roll < pA + pDraw) return 'draw';
         return 'B';
       },
-      generateGoalTotal(teamA, teamB) {
+      generateGoalTotal(teamA, teamB, threshold) {
         const avgAtk = (teamA.attack + teamB.attack) / 2;
-        const prob = Events.clamp(0.35 + (avgAtk - 70) * 0.008 + Events.rand(-0.05, 0.05), 0.20, 0.80);
+        // Lower threshold → easier to go 'high'; adjust base probability accordingly
+        const thresholdBias = (2.5 - (threshold || 2.5)) * 0.08;
+        const prob = Events.clamp(0.35 + thresholdBias + (avgAtk - 70) * 0.008 + Events.rand(-0.05, 0.05), 0.20, 0.80);
         return Math.random() < prob ? 'high' : 'low';
       },
       isScoringEvent(type) {
@@ -394,10 +396,11 @@ const Events = {
         const pA = Events.clamp(0.5 + diff * 0.006 + Events.rand(-0.05, 0.05), 0.18, 0.82);
         return Math.random() < pA ? 'A' : 'B';
       },
-      generateGoalTotal(teamA, teamB) {
+      generateGoalTotal(teamA, teamB, threshold) {
         const avgAtk = (teamA.attack + teamB.attack) / 2;
         const avgTempo = (teamA.tempo + teamB.tempo) / 2;
-        const prob = Events.clamp(0.42 + (avgAtk - 70) * 0.006 + (avgTempo - 70) * 0.005 + Events.rand(-0.05, 0.05), 0.24, 0.82);
+        const thresholdBias = (5.5 - (threshold || 5.5)) * 0.06;
+        const prob = Events.clamp(0.42 + thresholdBias + (avgAtk - 70) * 0.006 + (avgTempo - 70) * 0.005 + Events.rand(-0.05, 0.05), 0.24, 0.82);
         return Math.random() < prob ? 'high' : 'low';
       },
       isScoringEvent(type) {
@@ -794,7 +797,7 @@ const Events = {
     return this._profile(section).generateMatchResult(teamA, teamB);
   },
 
-  generateGoalTotal(section, teamA, teamB) {
-    return this._profile(section).generateGoalTotal(teamA, teamB);
+  generateGoalTotal(section, teamA, teamB, threshold) {
+    return this._profile(section).generateGoalTotal(teamA, teamB, threshold);
   },
 };
