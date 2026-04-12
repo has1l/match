@@ -2902,6 +2902,182 @@ button:active { transform: scale(0.97); }
   flex-shrink: 0;
 }
 
+/* --- Key players (football prematch) --- */
+.pm3-kp-teams {
+  display: flex;
+  gap: 10px;
+}
+.pm3-kp-side {
+  flex: 1;
+  min-width: 0;
+}
+.pm3-kp-team-label {
+  font-size: 9px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 6px;
+  text-align: center;
+}
+.pm3-kp-row {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.pm3-kp-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid color-mix(in srgb, var(--tc) 40%, transparent);
+  border-radius: 12px;
+  padding: 8px 6px 6px;
+  width: 68px;
+  flex-shrink: 0;
+  position: relative;
+}
+.pm3-kp-photo-wrap {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid color-mix(in srgb, var(--tc) 70%, transparent);
+  margin-bottom: 5px;
+  background: rgba(255,255,255,0.06);
+  flex-shrink: 0;
+}
+.pm3-kp-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  display: block;
+}
+.pm3-kp-av {
+  width: 100%;
+  height: 100%;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 900;
+  color: #fff;
+}
+.pm3-kp-num {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background: var(--tc);
+  color: #fff;
+  font-size: 7px;
+  font-weight: 900;
+  border-radius: 4px 0 4px 0;
+  padding: 1px 3px;
+  line-height: 1.2;
+}
+.pm3-kp-name {
+  font-size: 8px;
+  font-weight: 800;
+  color: #fff;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+  line-height: 1.3;
+}
+.pm3-kp-pos {
+  font-size: 7px;
+  color: rgba(255,255,255,0.4);
+  text-align: center;
+  margin-top: 1px;
+}
+.pm3-kp-stats {
+  display: flex;
+  gap: 3px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 4px;
+}
+.pm3-kp-stats span {
+  font-size: 7px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.55);
+  background: rgba(255,255,255,0.07);
+  border-radius: 4px;
+  padding: 1px 3px;
+}
+
+/* --- Lineup rows (football prematch) --- */
+.pm3-section--lineup { padding-bottom: 4px; }
+.pm3-lineup-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.pm3-lineup-col { min-width: 0; }
+.pm3-lineup-col-header {
+  font-size: 9px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 5px;
+  text-align: center;
+}
+.pm3-lu-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.pm3-lu-row:last-child { border-bottom: none; }
+.pm3-lu-num {
+  font-size: 8px;
+  font-weight: 900;
+  width: 14px;
+  text-align: right;
+  flex-shrink: 0;
+}
+.pm3-lu-av {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1px solid transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: 900;
+  color: #fff;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.pm3-lu-name {
+  flex: 1;
+  min-width: 0;
+  font-size: 9px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.85);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pm3-lu-pos {
+  font-size: 7px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.3);
+  flex-shrink: 0;
+}
+.pm3-lu-shot {
+  font-size: 8px;
+  font-weight: 800;
+  color: rgba(255,200,0,0.7);
+  flex-shrink: 0;
+}
+
 /* --- Prediction card --- */
 .pm3-predict-card {
   margin: 14px 16px 0;
@@ -4583,14 +4759,65 @@ button:active { transform: scale(0.97); }
   border-radius: 50%;
   border: 2px solid rgba(255,255,255,0.7);
   z-index: 7;
-  transition: opacity 0.4s;
+  transition: opacity 0.4s, transform 0.25s, left 0.5s ease, top 0.5s ease;
   box-shadow: 0 1px 4px rgba(0,0,0,0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+}
+/* Player currently has the ball — glows and pulses */
+.lv-idlep--active {
+  transform: scale(1.5);
+  border-color: #fff;
+  border-width: 2.5px;
+  box-shadow: 0 0 0 3px rgba(255,255,255,0.35), 0 0 10px rgba(255,220,0,0.7), 0 2px 6px rgba(0,0,0,0.5);
+  z-index: 9;
+  animation: lv-pulse 0.7s ease-in-out infinite alternate;
+}
+/* Player just passed — brief dim */
+.lv-idlep--passer {
+  opacity: 0.55;
+  transform: scale(0.9);
+}
+@keyframes lv-pulse {
+  from { box-shadow: 0 0 0 2px rgba(255,255,255,0.3), 0 0 8px rgba(255,220,0,0.6); }
+  to   { box-shadow: 0 0 0 5px rgba(255,255,255,0.15), 0 0 16px rgba(255,220,0,0.9); }
+}
+.lv-idlep--gk {
+  border-color: #fff;
+  border-width: 2.5px;
+  box-shadow: 0 0 6px rgba(255,255,255,0.5), 0 1px 4px rgba(0,0,0,0.5);
+}
+.lv-idlep-num {
+  position: absolute;
+  bottom: -9px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 6px;
+  font-weight: 900;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.9), 0 0 3px rgba(0,0,0,0.8);
+  white-space: nowrap;
+  line-height: 1;
+  pointer-events: none;
 }
 
 /* Hockey rink: player dots need dark border to show on light ice */
 .lv-field-wrap--hockey .lv-idlep {
   border-color: rgba(255,255,255,0.9);
   box-shadow: 0 1px 5px rgba(0,0,0,0.5);
+}
+
+/* FootballSim player dots — rAF-positioned, no CSS transitions */
+.fbp {
+  position: absolute;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.75);
+  z-index: 7;
+  pointer-events: none;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.55);
+  transition: opacity 0.3s;
 }
 
 /* Goal message */
@@ -4645,7 +4872,13 @@ button:active { transform: scale(0.97); }
   transform: translate(-50%, -50%);
   z-index: 10;
   filter: drop-shadow(0 2px 5px rgba(0,0,0,0.6));
+  animation: lv-ball-spin 1.8s linear infinite;
   /* transition set by JS for smooth movement */
+}
+@keyframes lv-ball-spin {
+  from { filter: drop-shadow(0 2px 5px rgba(0,0,0,0.6)); }
+  50%  { filter: drop-shadow(2px 0 5px rgba(0,0,0,0.6)); }
+  to   { filter: drop-shadow(0 2px 5px rgba(0,0,0,0.6)); }
 }
 .lv-ball::after {
   content: '';
@@ -4781,11 +5014,20 @@ button:active { transform: scale(0.97); }
 }
 .lv-pstat--att { border-color: rgba(255,200,0,0.3); }
 .lv-pstat-av {
-  width: 28px; height: 28px;
-  border-radius: 8px;
+  width: 36px; height: 36px;
+  border-radius: 10px;
   display: flex; align-items: center; justify-content: center;
   font-size: 13px; font-weight: 900; color: #fff;
   flex-shrink: 0;
+  overflow: hidden;
+  position: relative;
+}
+.lv-pstat-photo {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  display: block;
+  border-radius: 10px;
 }
 .lv-pstat-av--def { background: #1565c0; }
 .lv-pstat-info { flex: 1; min-width: 0; }
@@ -5515,6 +5757,29 @@ button:active { transform: scale(0.97); }
     gap: 6px;
     font-size: 15px;
   }
+
+  /* Key player cards - desktop */
+  .pm3-kp-card {
+    width: 90px;
+    padding: 10px 8px 8px;
+  }
+  .pm3-kp-photo-wrap {
+    width: 64px;
+    height: 64px;
+    margin-bottom: 7px;
+  }
+  .pm3-kp-name { font-size: 10px; }
+  .pm3-kp-pos  { font-size: 8px; }
+  .pm3-kp-stats span { font-size: 8px; }
+
+  /* Lineup rows - desktop */
+  .pm3-lu-av { width: 26px; height: 26px; }
+  .pm3-lu-name { font-size: 11px; }
+  .pm3-lu-num  { font-size: 10px; width: 18px; }
+  .pm3-lu-pos  { font-size: 8px; }
+  .pm3-lu-shot { font-size: 9px; }
+  .pm3-lineup-col-header { font-size: 11px; }
+  .pm3-lu-row { padding: 4px 0; }
 
   .pm3-predict-card {
     margin-top: 22px;

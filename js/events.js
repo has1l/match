@@ -86,8 +86,6 @@ const Events = {
         { x: 35, y: 50 }, { x: 65, y: 45 }, { x: 50, y: 25 }, { x: 50, y: 75 }, { x: 30, y: 35 },
         { x: 70, y: 60 }, { x: 60, y: 30 }, { x: 40, y: 70 },
       ],
-      goalieNames: ['Е. Савин', 'К. Воронов', 'Р. Стоев', 'Н. Крот', 'М. Белый', 'А. Громов', 'И. Полоз'],
-      defenderNames: ['А. Скала', 'С. Камень', 'В. Стена', 'И. Гранит', 'Д. Железо', 'Р. Твёрдый'],
       calcRating(team) {
         return team.attack * 0.35 + team.defense * 0.30 + team.midfield * 0.20 + team.formScore * 0.15;
       },
@@ -97,12 +95,13 @@ const Events = {
       },
       getOpp(type, defTeam) {
         const isGKEvent = ['penalty', 'one_on_one', 'free_kick', 'long_shot', 'corner', 'header'].includes(type);
-        return {
-          name: Events.pick(isGKEvent ? this.goalieNames : this.defenderNames),
-          pos: isGKEvent ? 'Вратарь' : 'Защитник',
-          stat: Math.round(Events.clamp(defTeam.defense + Events.rand(-6, 6), 40, 99)),
-          statName: 'защита',
-        };
+        if (isGKEvent) {
+          const gk = defTeam.players.find(p => p.posCode === 'GK') || defTeam.players[0];
+          return { name: gk.name, pos: gk.pos, stat: Math.round(Events.clamp(defTeam.defense + Events.rand(-6, 6), 40, 99)), statName: 'защита' };
+        }
+        const defPool = defTeam.players.filter(p => ['CB','RB','LB','DM'].includes(p.posCode));
+        const def = defPool.length ? Events.pick(defPool) : defTeam.players[2];
+        return { name: def.name, pos: def.pos, stat: Math.round(Events.clamp(defTeam.defense + Events.rand(-6, 6), 40, 99)), statName: 'защита' };
       },
       getPlayerStat(player, type) {
         if (type === 'counterattack') return { name: 'скорость', val: player.speed };
@@ -282,8 +281,6 @@ const Events = {
         { x: 30, y: 48 }, { x: 69, y: 45 }, { x: 50, y: 22 }, { x: 51, y: 77 }, { x: 35, y: 31 },
         { x: 74, y: 58 }, { x: 63, y: 27 }, { x: 42, y: 73 },
       ],
-      goalieNames: ['Н. Фрост', 'М. Айс', 'К. Блокер', 'А. Гловер', 'Р. Уолл'],
-      defenderNames: ['С. Блулайн', 'И. Борд', 'Т. Хитч', 'В. Клип', 'П. Щит'],
       calcRating(team) {
         return team.attack * 0.32 + team.defense * 0.24 + team.goalie * 0.22 + team.tempo * 0.12 + team.formScore * 0.10;
       },
@@ -302,12 +299,13 @@ const Events = {
       getOpp(type, defTeam) {
         const isGoalie = ['shot_on_goal', 'breakaway', 'rebound', 'one_timer'].includes(type);
         const baseStat = isGoalie ? defTeam.goalie : defTeam.defense;
-        return {
-          name: Events.pick(isGoalie ? this.goalieNames : this.defenderNames),
-          pos: isGoalie ? 'Вратарь' : 'Защитник',
-          stat: Math.round(Events.clamp(baseStat + Events.rand(-6, 6), 40, 99)),
-          statName: isGoalie ? 'save' : 'defense',
-        };
+        if (isGoalie) {
+          const gk = defTeam.players.find(p => p.pos === 'goalie') || defTeam.players[0];
+          return { name: gk.name, pos: 'Вратарь', stat: Math.round(Events.clamp(baseStat + Events.rand(-6, 6), 40, 99)), statName: 'save' };
+        }
+        const defPool = defTeam.players.filter(p => p.pos === 'defender');
+        const def = defPool.length ? Events.pick(defPool) : defTeam.players[1];
+        return { name: def.name, pos: 'Защитник', stat: Math.round(Events.clamp(baseStat + Events.rand(-6, 6), 40, 99)), statName: 'defense' };
       },
       getPlayerStat(player, type) {
         if (type === 'breakaway') return { name: 'скорость', val: player.speed };
@@ -664,6 +662,48 @@ const Events = {
     return this._profile(section).calcRating(team);
   },
 
+  // Pick an appropriate attacker by event type — never picks GK
+  _pickAttacker(section, type, team) {
+    const all = team.players;
+    if (section === 'football') {
+      // corner / free_kick — midfielders or wingers
+      if (type === 'corner' || type === 'free_kick') {
+        const pool = all.filter(p => ['CM','AM','RW','LW','DM'].includes(p.posCode));
+        if (pool.length) return this.pick(pool);
+      }
+      // penalty / one_on_one / attack — forwards first, fallback mid
+      if (type === 'penalty' || type === 'one_on_one' || type === 'attack') {
+        const pool = all.filter(p => ['ST','LW','RW','AM'].includes(p.posCode));
+        if (pool.length) return this.pick(pool);
+      }
+      // counterattack — fast players (forwards + wide mids)
+      if (type === 'counterattack') {
+        const pool = all.filter(p => ['ST','LW','RW'].includes(p.posCode));
+        if (pool.length) return this.pick(pool);
+      }
+      // header — forwards + defenders who attack corners
+      if (type === 'header') {
+        const pool = all.filter(p => ['ST','CB','AM','CM'].includes(p.posCode));
+        if (pool.length) return this.pick(pool);
+      }
+      // long_shot — midfielders
+      if (type === 'long_shot') {
+        const pool = all.filter(p => ['CM','AM','DM','LW','RW'].includes(p.posCode));
+        if (pool.length) return this.pick(pool);
+      }
+      // default football: anyone except GK
+      const pool = all.filter(p => p.posCode !== 'GK');
+      return pool.length ? this.pick(pool) : all[0];
+    }
+    if (section === 'hockey') {
+      // goalie never attacks
+      const pool = all.filter(p => p.pos !== 'goalie');
+      return pool.length ? this.pick(pool) : all[0];
+    }
+    // esports / other — no GK concept, pick anyone
+    return this.pick(all);
+  },
+
   _mirrorLayout(layout) {
     const mx = (pos) => pos ? { x: 100 - pos.x, y: pos.y } : null;
     return {
@@ -702,7 +742,7 @@ const Events = {
 
       const prob = profile.getProb(atkR, defR, type);
       const correct = Math.random() < prob ? 'yes' : 'no';
-      const player = this.pick(attacker.players);
+      const player = this._pickAttacker(section, type, attacker);
       const opp = profile.getOpp(type, defender);
       const minute = Math.max(1, Math.min(profile.matchMinutes, (i + 1) * minuteStep + Math.floor(this.rand(-2, 3))));
       const baseLayout = profile.fieldLayouts[type];

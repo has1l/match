@@ -1063,6 +1063,47 @@ const UI = {
       return `<span class="pm3-dot ${cls}">${r}</span>`;
     }).join('');
 
+    // Big key-player card with photo support
+    const playerCardKey = (p, team) => {
+      if (!p) return '';
+      const photoSrc = `assets/img/players/football/${p.id}.jpg`;
+      const initials = p.name.replace(/^[А-ЯЁA-Z]\.\s*/, '').slice(0, 1);
+      return `
+        <div class="pm3-kp-card" style="--tc:${team.color}">
+          <div class="pm3-kp-photo-wrap">
+            <img class="pm3-kp-photo" src="${photoSrc}" alt="${p.name}"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+            <div class="pm3-kp-av" style="background:${team.color};display:none">${initials}</div>
+            <div class="pm3-kp-num">#${p.num || ''}</div>
+          </div>
+          <div class="pm3-kp-name">${p.name}</div>
+          <div class="pm3-kp-pos">${p.pos}</div>
+          <div class="pm3-kp-stats">
+            ${sport.playerStats(p).map(s => `<span>${s}</span>`).join('')}
+          </div>
+        </div>`;
+    };
+
+    // Compact lineup row
+    const lineupRow = (p, team) => {
+      if (!p) return '';
+      const posShort = { GK:'ВРТ', RB:'ПЗ', LB:'ЛЗ', CB:'ЦЗ', DM:'ОПЗ', CM:'ЦПЗ', AM:'АПЗ', LW:'ЛН', RW:'ПН', ST:'ФОР' };
+      const code = posShort[p.posCode] || p.posCode || '';
+      const photoSrc = p.id ? `assets/img/players/football/${p.id}.jpg` : '';
+      const initials = p.name.replace(/^[А-ЯЁA-Z]\.\s*/, '').slice(0, 1);
+      return `
+        <div class="pm3-lu-row">
+          <span class="pm3-lu-num" style="color:${team.color}">${p.num || ''}</span>
+          <div class="pm3-lu-av" style="background:${team.color}22;border-color:${team.color}44">
+            ${photoSrc ? `<img src="${photoSrc}" onerror="this.style.display='none';this.nextElementSibling.style.display='block'" style="width:100%;height:100%;object-fit:cover;border-radius:50%"><span style="display:none">${initials}</span>` : `<span>${initials}</span>`}
+          </div>
+          <span class="pm3-lu-name">${p.name}</span>
+          <span class="pm3-lu-pos">${code}</span>
+          <span class="pm3-lu-shot">⚡${p.shot}</span>
+        </div>`;
+    };
+
+    // Legacy small card (keep for hockey/esports)
     const playerCard = (p, team) => {
       if (!p) return '';
       return `
@@ -1134,13 +1175,44 @@ const UI = {
                 </div>
               </div>
 
+              ${section === 'football' ? `
+              <div class="pm3-section pm3-section--kp">
+                <div class="pm3-section-title">${sport.playersTitle}</div>
+                <div class="pm3-kp-teams">
+                  <div class="pm3-kp-side">
+                    <div class="pm3-kp-team-label" style="color:${teamA.color}">${teamA.shortName}</div>
+                    <div class="pm3-kp-row">
+                      ${teamA.players.filter(p => p.key).slice(0,3).map(p => playerCardKey(p, teamA)).join('')}
+                    </div>
+                  </div>
+                  <div class="pm3-kp-side">
+                    <div class="pm3-kp-team-label" style="color:${teamB.color}">${teamB.shortName}</div>
+                    <div class="pm3-kp-row">
+                      ${teamB.players.filter(p => p.key).slice(0,3).map(p => playerCardKey(p, teamB)).join('')}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="pm3-section pm3-section--lineup">
+                <div class="pm3-section-title">СТАРТОВЫЙ СОСТАВ</div>
+                <div class="pm3-lineup-cols">
+                  <div class="pm3-lineup-col">
+                    <div class="pm3-lineup-col-header" style="color:${teamA.color}">${teamA.name}</div>
+                    ${teamA.players.slice(0,11).map(p => lineupRow(p, teamA)).join('')}
+                  </div>
+                  <div class="pm3-lineup-col">
+                    <div class="pm3-lineup-col-header" style="color:${teamB.color}">${teamB.name}</div>
+                    ${teamB.players.slice(0,11).map(p => lineupRow(p, teamB)).join('')}
+                  </div>
+                </div>
+              </div>` : `
               <div class="pm3-section pm3-section--players">
                 <div class="pm3-section-title">${sport.playersTitle}</div>
                 <div class="pm3-players-scroll">
                   ${teamA.players.slice(0, 2).map(p => playerCard(p, teamA)).join('')}
                   ${teamB.players.slice(0, 2).map(p => playerCard(p, teamB)).join('')}
                 </div>
-              </div>
+              </div>`}
 
               <div class="pm3-predict-card">
                 <div class="pm3-predict-q">
@@ -1419,47 +1491,75 @@ const UI = {
       }
     }
 
+    // Football: init FootballSim engine
+    if (match.section === 'football') {
+      const fieldEl = screen.querySelector('#lv-field');
+      if (fieldEl && typeof FootballSim !== 'undefined') {
+        FootballSim.init(fieldEl, teamA, teamB);
+        FootballSim.start();
+      }
+    }
+
     // Kickoff: ball at center, then start idle + first event
     setTimeout(() => {
-      if (match.section !== 'esports') this._lvStartIdle();
+      if (match.section !== 'esports' && match.section !== 'football') this._lvStartIdle();
       setTimeout(() => this._lvTriggerEvent(), 2200);
     }, 300);
   },
 
   _lvIdlePlayers(teamA, teamB) {
     const section = Game.match && Game.match.section;
-    // CS2: players are handled by CS2Sim engine
     if (section === 'esports') return '';
+    // FootballSim creates and manages player elements directly
+    if (section === 'football') return '';
+
     const A = teamA.color;
     const B = teamB.color;
-    const dots = section === 'hockey'
-      ? [
-          // Team A (left side)
-          { x: 6,  y: 50, c: A, gk: true },           // вратарь
-          { x: 23, y: 37, c: A }, { x: 23, y: 63, c: A }, // защитники
-          { x: 44, y: 50, c: A },                       // центр
-          { x: 60, y: 34, c: A, fwd: true }, { x: 60, y: 66, c: A, fwd: true }, // нападающие
-          // Team B (right side)
-          { x: 94, y: 50, c: B, gk: true },
-          { x: 77, y: 37, c: B }, { x: 77, y: 63, c: B },
-          { x: 56, y: 50, c: B },
-          { x: 40, y: 34, c: B, fwd: true }, { x: 40, y: 66, c: B, fwd: true },
-        ]
-      : [
-          { x:4,  y:50, c:A, gk:true  },
-          { x:22, y:27, c:A },
-          { x:22, y:73, c:A },
-          { x:40, y:40, c:A },
-          { x:40, y:60, c:A },
-          { x:57, y:50, c:A, fwd:true },
-          { x:96, y:50, c:B, gk:true  },
-          { x:78, y:27, c:B },
-          { x:78, y:73, c:B },
-          { x:60, y:40, c:B },
-          { x:60, y:60, c:B },
-        ];
-    return dots.map(d => {
-      const size = d.gk ? (section === 'hockey' ? 20 : 18) : d.fwd ? 18 : 15;
+
+    if (section === 'football_UNUSED') {
+      // 4-3-3 formation positions for Team A (left→right)
+      const posA = [
+        { x:4,  y:50, gk:true },           // [0] GK
+        { x:17, y:18 },                     // [1] RB
+        { x:17, y:37 },                     // [2] CB
+        { x:17, y:63 },                     // [3] CB
+        { x:17, y:82 },                     // [4] LB
+        { x:31, y:50 },                     // [5] DM
+        { x:38, y:30 },                     // [6] CM
+        { x:38, y:70 },                     // [7] AM/CM
+        { x:48, y:18 },                     // [8] RW
+        { x:48, y:50, fwd:true },           // [9] ST
+        { x:48, y:82 },                     // [10] LW
+      ];
+      // Team B mirrors Team A
+      const posB = posA.map(p => ({ x: 100 - p.x, y: p.y, gk: p.gk, fwd: p.fwd }));
+
+      const playersA = (teamA.players || []).slice(0, 11);
+      const playersB = (teamB.players || []).slice(0, 11);
+
+      const dot = (p, pos, color) => {
+        const num = p ? (p.num || '') : '';
+        const size = pos.gk ? 18 : pos.fwd ? 17 : 14;
+        return `<div class="lv-idlep ${pos.gk ? 'lv-idlep--gk' : ''}" data-bx="${pos.x}" data-by="${pos.y}" title="${p ? p.name : ''}" style="left:${pos.x}%;top:${pos.y}%;background:${color};width:${size}px;height:${size}px;margin-left:-${size/2}px;margin-top:-${size/2}px">${num ? `<span class="lv-idlep-num">${num}</span>` : ''}</div>`;
+      };
+
+      return posA.map((pos, i) => dot(playersA[i], pos, A)).join('') +
+             posB.map((pos, i) => dot(playersB[i], pos, B)).join('');
+    }
+
+    // Hockey — 6 players per side (GK + 2 defenders + center + 2 forwards)
+    const dotsHockey = [
+      { x: 6,  y: 50, c: A, gk: true },
+      { x: 23, y: 37, c: A }, { x: 23, y: 63, c: A },
+      { x: 44, y: 50, c: A },
+      { x: 60, y: 34, c: A, fwd: true }, { x: 60, y: 66, c: A, fwd: true },
+      { x: 94, y: 50, c: B, gk: true },
+      { x: 77, y: 37, c: B }, { x: 77, y: 63, c: B },
+      { x: 56, y: 50, c: B },
+      { x: 40, y: 34, c: B, fwd: true }, { x: 40, y: 66, c: B, fwd: true },
+    ];
+    return dotsHockey.map(d => {
+      const size = d.gk ? 20 : d.fwd ? 18 : 15;
       return `<div class="lv-idlep" style="left:${d.x}%;top:${d.y}%;background:${d.c};width:${size}px;height:${size}px;margin-left:-${size/2}px;margin-top:-${size/2}px"></div>`;
     }).join('');
   },
@@ -1472,21 +1572,218 @@ const UI = {
     ball.style.top  = y + '%';
   },
 
+  _lvGetDots() {
+    const screen = this._lsScreen;
+    if (!screen) return [];
+    const wrap = screen.querySelector('#lv-idle-players');
+    return wrap ? Array.from(wrap.querySelectorAll('.lv-idlep')) : [];
+  },
+
+  // Move a player dot toward the ball, then back to base position
+  _lvJogPlayer(dot, ballX, ballY, passDur) {
+    if (!dot || !dot.dataset.bx) return;
+    const bx = parseFloat(dot.dataset.bx);
+    const by = parseFloat(dot.dataset.by);
+    const dx = (ballX - bx) * 0.18;
+    const dy = (ballY - by) * 0.18;
+    dot.style.transition = `left ${passDur * 0.7}s ease, top ${passDur * 0.7}s ease`;
+    dot.style.left = (bx + dx) + '%';
+    dot.style.top  = (by + dy) + '%';
+    setTimeout(() => {
+      if (dot.classList.contains('lv-idlep--active')) return; // still active — don't reset yet
+      dot.style.transition = 'left 1s ease, top 1s ease';
+      dot.style.left = bx + '%';
+      dot.style.top  = by + '%';
+    }, passDur * 700 + 600);
+  },
+
+  // Reset a dot back to its base formation position
+  _lvResetDot(dot, dur) {
+    if (!dot || !dot.dataset.bx) return;
+    dot.style.transition = `left ${dur}s ease, top ${dur}s ease`;
+    dot.style.left = dot.dataset.bx + '%';
+    dot.style.top  = dot.dataset.by + '%';
+    dot.classList.remove('lv-idlep--active', 'lv-idlep--passer');
+  },
+
   _lvStartIdle() {
     const st = this._lsState;
     if (!st) return;
-    const pos = Events.getIdlePositions(Game.match ? Game.match.section : 'football');
-    st.idleTimer = setInterval(() => {
+    const section = Game.match ? Game.match.section : 'football';
+
+    if (section !== 'football') {
+      const pos = Events.getIdlePositions(section);
+      st.idleTimer = setInterval(() => {
+        if (!st || st.phase !== 'idle') return;
+        st.idleIdx = (st.idleIdx + 1) % pos.length;
+        const p = pos[st.idleIdx];
+        this._lvMove(p.x, p.y, 0.85);
+      }, 1150);
+      return;
+    }
+
+    // Football: realistic passing between player dots
+    st.possession = st.possession || false;
+    this._lvRunPassChain();
+  },
+
+  // Main passing loop for football idle phase
+  _lvRunPassChain() {
+    const st = this._lsState;
+    if (!st || st.phase !== 'idle') return;
+
+    // Alternate possession
+    st.possession = !st.possession;
+    const off = st.possession ? 0 : 11; // 0-10 teamA, 11-21 teamB
+
+    // Passing patterns: [idx sequence within team]
+    // Formation indices: 0=GK,1=RB,2=CB,3=CB,4=LB,5=DM,6=CM,7=AM,8=RW,9=ST,10=LW
+    const patterns = [
+      [2, 5, 6, 9],        // CB→DM→CM→ST
+      [4, 7, 10, 9],       // LB→AM→LW→ST
+      [1, 6, 8, 9],        // RB→CM→RW→ST
+      [5, 6, 9],           // DM→CM→ST
+      [3, 5, 7, 10],       // CB→DM→AM→LW
+      [5, 8, 9],           // DM→RW→ST
+      [4, 5, 6],           // LB→DM→CM (possession)
+      [2, 3, 5, 6],        // CB→CB→DM→CM
+    ];
+    const raw = patterns[Math.floor(Math.random() * patterns.length)];
+    const chain = raw.map(i => off + i);
+
+    const dots = this._lvGetDots();
+    let idx = 0;
+    let prevDot = null;
+
+    const step = () => {
       if (!st || st.phase !== 'idle') return;
-      st.idleIdx = (st.idleIdx + 1) % pos.length;
-      const p = pos[st.idleIdx];
-      this._lvMove(p.x, p.y, 0.85);
-    }, 1150);
+
+      // Deactivate previous
+      if (prevDot) {
+        prevDot.classList.remove('lv-idlep--active');
+        prevDot.classList.add('lv-idlep--passer');
+        this._lvResetDot(prevDot, 1.0);
+      }
+
+      if (idx >= chain.length) {
+        // Short break then pick new chain
+        st.passTimer = setTimeout(() => this._lvRunPassChain(), 300);
+        return;
+      }
+
+      const dotIdx = chain[idx];
+      const dot = dots[dotIdx];
+      idx++;
+
+      if (!dot) { st.passTimer = setTimeout(step, 300); return; }
+
+      dot.classList.remove('lv-idlep--passer');
+      dot.classList.add('lv-idlep--active');
+      prevDot = dot;
+
+      const bx = parseFloat(dot.dataset.bx);
+      const by = parseFloat(dot.dataset.by);
+
+      // Distance-based pass speed
+      let dist = 20;
+      if (prevDot && prevDot !== dot) {
+        const pbx = parseFloat(prevDot.dataset.bx) || bx;
+        const pby = parseFloat(prevDot.dataset.by) || by;
+        dist = Math.sqrt((bx - pbx) ** 2 + (by - pby) ** 2);
+      }
+      const passDur = Math.max(0.2, Math.min(0.55, 0.15 + dist * 0.013));
+
+      // Ball moves to this player
+      this._lvMove(bx, by, passDur);
+      // Player jogs toward ball
+      this._lvJogPlayer(dot, bx, by, passDur);
+
+      // Also: nearby defenders shift slightly toward ball (pressure)
+      const defOff = st.possession ? 11 : 0;
+      [defOff+2, defOff+3, defOff+5].forEach(di => {
+        const dd = dots[di];
+        if (!dd || !dd.dataset.bx) return;
+        const dbx = parseFloat(dd.dataset.bx);
+        const dby = parseFloat(dd.dataset.by);
+        const pressX = (bx - dbx) * 0.06;
+        const pressY = (by - dby) * 0.06;
+        dd.style.transition = 'left 0.7s ease, top 0.7s ease';
+        dd.style.left = (dbx + pressX) + '%';
+        dd.style.top  = (dby + pressY) + '%';
+        setTimeout(() => {
+          dd.style.transition = 'left 1.2s ease, top 1.2s ease';
+          dd.style.left = dbx + '%';
+          dd.style.top  = dby + '%';
+        }, 1200);
+      });
+
+      const hold = 450 + Math.random() * 500;
+      st.passTimer = setTimeout(step, passDur * 1000 + hold);
+    };
+
+    step();
+  },
+
+  // 2-pass build-up sequence before event, then calls onDone
+  _lvBuildUp(event, onDone) {
+    const dots = this._lvGetDots();
+    if (!dots.length || Game.match.section !== 'football') { onDone(); return; }
+
+    const off = event.teamAAttacks ? 0 : 11;
+
+    // Which player leads into the event? Depends on type
+    const leadChains = {
+      attack:        [off+5, off+9],
+      counterattack: [off+10, off+9],
+      penalty:       [off+6, off+9],
+      one_on_one:    [off+8, off+9],
+      corner:        [off+6, off+8],
+      free_kick:     [off+5, off+6],
+      header:        [off+7, off+10],
+      long_shot:     [off+5, off+6],
+    };
+    const chain = leadChains[event.type] || [off+5, off+9];
+
+    // Deactivate all
+    dots.forEach(d => d.classList.remove('lv-idlep--active', 'lv-idlep--passer'));
+
+    let idx = 0;
+    let prevDot = null;
+    const step = () => {
+      if (idx >= chain.length) {
+        // Small pause then trigger event
+        setTimeout(onDone, 180);
+        return;
+      }
+      const dot = dots[chain[idx]];
+      idx++;
+      if (!dot) { step(); return; }
+
+      if (prevDot) {
+        prevDot.classList.remove('lv-idlep--active');
+        prevDot.classList.add('lv-idlep--passer');
+        setTimeout(() => this._lvResetDot(prevDot, 0.8), 600);
+      }
+      dots.forEach(d => d.classList.remove('lv-idlep--active'));
+      dot.classList.add('lv-idlep--active');
+      prevDot = dot;
+
+      const bx = parseFloat(dot.dataset.bx);
+      const by = parseFloat(dot.dataset.by);
+      this._lvMove(bx, by, 0.3);
+      this._lvJogPlayer(dot, bx, by, 0.3);
+
+      setTimeout(step, 520);
+    };
+    step();
   },
 
   _lvStopIdle() {
     const st = this._lsState;
     if (st && st.idleTimer) { clearInterval(st.idleTimer); st.idleTimer = null; }
+    if (st && st.passTimer) { clearTimeout(st.passTimer); st.passTimer = null; }
+    // Reset all dots to base
+    this._lvGetDots().forEach(d => this._lvResetDot(d, 0.5));
   },
 
   _lvTriggerEvent() {
@@ -1510,34 +1807,55 @@ const UI = {
     const timeEl = screen.querySelector('#lv-time');
     if (timeEl) timeEl.textContent = event.minute + "'";
 
-    // Show event players, dim idle players
     const isEsports = match.section === 'esports';
+    const isFootball = match.section === 'football';
+
     if (isEsports && typeof CS2Sim !== 'undefined') {
       CS2Sim.pause();
       CS2Sim.dimAll();
     }
-    const idleP = screen.querySelector('#lv-idle-players');
-    if (idleP) idleP.style.opacity = '0.25';
-    const evP = screen.querySelector('#lv-event-players');
-    if (evP) {
-      const attColor = event.attacker.color;
-      const defColor = event.defender.color;
-      const mk = (pos, cls, color) =>
-        `<div class="lv-player lv-player--${cls}" style="left:${pos.x}%;top:${pos.y}%;background:${color}"></div>`;
-      evP.innerHTML =
-        (layout.gk        ? mk(layout.gk, 'gk', defColor) : '') +
-        (layout.defenders||[]).map(p => mk(p, 'def', defColor)).join('') +
-        (layout.attacker   ? mk(layout.attacker, 'att', attColor) : '');
+
+    // Shared: dim players + show event UI on field
+    const doEventShow = () => {
+      if (isFootball && typeof FootballSim !== 'undefined') {
+        FootballSim.dimAllExceptEvent();
+      } else {
+        const idleP = screen.querySelector('#lv-idle-players');
+        if (idleP) idleP.style.opacity = '0.22';
+      }
+      const evP = screen.querySelector('#lv-event-players');
+      if (evP) {
+        if (isFootball) {
+          evP.innerHTML = ''; // Real players are already physically there
+        } else {
+          const attColor = event.attacker.color;
+          const defColor = event.defender.color;
+          const mk = (pos, cls, color) =>
+            `<div class="lv-player lv-player--${cls}" style="left:${pos.x}%;top:${pos.y}%;background:${color}"></div>`;
+          evP.innerHTML =
+            (layout.gk         ? mk(layout.gk, 'gk', defColor) : '') +
+            (layout.defenders||[]).map(p => mk(p, 'def', defColor)).join('') +
+            (layout.attacker    ? mk(layout.attacker, 'att', attColor) : '');
+        }
+      }
+      // Final ball move to event spot (CSS transition — FootballSim is paused at this point)
+      this._lvMove(bx, by, 0.45);
+      setTimeout(() => {
+        st.phase = 'event';
+        this._lvShowEventUI(screen, event);
+      }, 520);
+    };
+
+    if (isFootball && typeof FootballSim !== 'undefined') {
+      // FootballSim handles physical build-up runs, pauses itself, then fires doEventShow
+      FootballSim.buildUpTo(event, doEventShow);
+    } else {
+      this._lvMove(bx, by, 0.8);
+      setTimeout(() => {
+        st.phase = 'event';
+        this._lvShowEventUI(screen, event);
+      }, 900);
     }
-
-    // Move ball to event position
-    this._lvMove(bx, by, 0.8);
-
-    // Reveal event UI after ball arrives
-    setTimeout(() => {
-      st.phase = 'event';
-      this._lvShowEventUI(screen, event);
-    }, 900);
   },
 
   _lvShowEventUI(screen, event) {
@@ -1570,7 +1888,11 @@ const UI = {
     if (pbar) {
       pbar.innerHTML = `
         <div class="lv-pstat lv-pstat--att" style="border-color:${event.attacker.color}55">
-          <div class="lv-pstat-av" style="background:${event.attacker.color}">${event.player.name.split(' ').pop()[0]}</div>
+          <div class="lv-pstat-av" style="background:${event.attacker.color}">
+            ${event.player.id && match.section === 'football'
+              ? `<img src="assets/img/players/football/${event.player.id}.jpg" class="lv-pstat-photo" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><span style="display:none">${event.player.name.split(' ').pop()[0]}</span>`
+              : event.player.name.split(' ').pop()[0]}
+          </div>
           <div class="lv-pstat-info">
             <div class="lv-pstat-name">${event.player.name}</div>
             <div class="lv-pstat-role">${event.player.pos}</div>
@@ -1721,31 +2043,50 @@ const UI = {
       if (answers) { answers.style.opacity = '0'; answers.style.pointerEvents = 'none'; }
       if (fbEl)    { fbEl.textContent = ''; }
 
-      // Restore idle players
+      // Restore idle players, reset all dots to formation
       const evP   = screen.querySelector('#lv-event-players');
       const idleP = screen.querySelector('#lv-idle-players');
       if (evP)   evP.innerHTML = '';
       if (idleP) idleP.style.opacity = '1';
 
+      const isCs2      = Game.match && Game.match.section === 'esports';
+      const isFootball = Game.match && Game.match.section === 'football';
+
+      if (!isCs2 && !isFootball) {
+        this._lvGetDots().forEach(d => this._lvResetDot(d, 0.6));
+      }
+
       // CS2: restore and resume simulation, new round routes
-      const isCs2 = Game.match && Game.match.section === 'esports';
       if (isCs2 && typeof CS2Sim !== 'undefined') {
         CS2Sim.restoreAll();
         CS2Sim.newRound(Game.match.teamA.color, Game.match.teamB.color);
         CS2Sim.resume();
       }
 
+      // Football: restore and trigger new round in FootballSim
+      if (isFootball && typeof FootballSim !== 'undefined') {
+        FootballSim.restoreAll();
+        FootballSim.newRound(isGoal, !!(event && event.teamAAttacks));
+      }
+
       if (Game.match.phase2Done) { this._finishLevel(); return; }
 
-      // Resume — if goal ball goes center, if miss ball goes to defending GK
       st.phase   = 'idle';
       st.blocked = false;
-      if (!isCs2) this._lvMove(isGoal ? 50 : 6, 50, 0.9);
+
+      if (!isCs2 && !isFootball) {
+        if (isGoal) {
+          this._lvMove(50, 50, 0.7);
+        } else {
+          const savedByA = event && !event.teamAAttacks;
+          this._lvMove(savedByA ? 4 : 96, 50, 0.8);
+        }
+      }
 
       setTimeout(() => {
-        if (!isCs2) this._lvStartIdle();
-        setTimeout(() => this._lvTriggerEvent(), 1800);
-      }, 1000);
+        if (!isCs2 && !isFootball) this._lvStartIdle();
+        setTimeout(() => this._lvTriggerEvent(), 1600);
+      }, 950);
     }, delay);
   },
 
@@ -2034,7 +2375,8 @@ const UI = {
   // GAME OVER (no lives)
   // =============================================
   _showGameOver(currentScreen) {
-    if (typeof CS2Sim !== 'undefined') CS2Sim.destroy();
+    if (typeof CS2Sim      !== 'undefined') CS2Sim.destroy();
+    if (typeof FootballSim !== 'undefined') FootballSim.destroy();
     const canWatch = !Game.match.adUsed && SDK.canShowRewardedAd('life');
 
     const overlay = document.createElement('div');
@@ -2090,7 +2432,8 @@ const UI = {
   // FINISH LEVEL & RESULT SCREEN
   // =============================================
   _finishLevel() {
-    if (typeof CS2Sim !== 'undefined') CS2Sim.destroy();
+    if (typeof CS2Sim      !== 'undefined') CS2Sim.destroy();
+    if (typeof FootballSim !== 'undefined') FootballSim.destroy();
     Game.stopTimer();
     const result = Game.finishMatch();
     if (!result) return;
